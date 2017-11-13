@@ -1,0 +1,189 @@
+;Macros:
+PUSH: MACRO(reg)
+	subu r30, r30, 4
+	st reg, r30, 0
+ENDMACRO
+POP: MACRO(reg)
+	ld reg, r30, 0
+	addu r30, r30, 4
+ENDMACRO
+LEA: MACRO(reg, dato)
+	or reg, r0, low(dato)
+	or.u reg, reg, high(dato)
+ENDMACRO
+
+
+; Datos
+br INIC
+SUBMATRIZ: data 0x0202a202, 0x020202ff, 0x02
+IMG1: data 4, 5, 0x01020304, 0x05060708, 0x090a0b0c, 0x0d0e0f10, 0x11121314
+IMG2: data 4, 5, 0x01020308, 0x05060704, 0x090a0b0c, 0x0d0b0f10, 0x11121314; 4+4+3 = 11 = 0xb
+MFILTRO: data 8, 0, 1; K, C, B
+I: data 2
+J: data 3
+; IMG1:
+; 0x04  0x03  0x02  0x01  0x08
+; 0x07  0x06 |0x05  0x0c  0x0b|
+; 0x0a  0x09 |0x10 |0x0f| 0x0e|
+; 0x0d  0x14 |0x13  0x12  0x11|
+; IMG2:
+; 0x08  0x03  0x02  0x01  0x04
+; 0x07  0x06  0x05  0x0c  0x0b
+; 0x0a  0x09  0x10  0x0f  0x0b
+; 0x0d  0x14  0x13  0x12  0x11
+; pixel(I, J) = 0x0f
+; SUBMATRIZ resultante:
+; 0x100b0c05, 0x12130e0f, 0x00000011 (5, 12, 11, 16, 15, 14, 19, 18, 17 => 112 = 0x70)
+
+
+INIC:
+or r30, r0, 0xf000
+; Llamada a Comp
+;LEA(r2, IMG1)
+;LEA(r3, IMG2)
+;PUSH(r3)
+;PUSH(r2)
+;bsr Comp
+;addu r30, r30, 8
+; Llamada a SubMatriz
+;LEA(r2, IMG1)
+;LEA(r3, SUBMATRIZ)
+;LEA(r4, I)
+;LEA(r5, J)
+;ld r4, r4, 0
+;ld r5, r5, 0
+;PUSH(r5)
+;PUSH(r4)
+;PUSH(r3)
+;PUSH(r2)
+;bsr SubMatriz
+;addu r30, r30, 16
+; Llamada a ValorPixel
+LEA(r2, SUBMATRIZ)
+LEA(r3, MFILTRO)
+PUSH(r3)
+PUSH(r2)
+bsr ValorPixel
+addu r30, r30, 8
+; Llamada a FilPixel
+LEA(r2, IMG1)
+LEA(r3, I)
+LEA(r4, J)
+LEA(r5, MFILTRO)
+ld r3, r3, 0
+ld r4, r4, 0
+PUSH(r5)
+PUSH(r4)
+PUSH(r3)
+PUSH(r2)
+;bsr FilPixel
+addu r30, r30, 16
+stop
+
+
+
+FiltRec:
+PUSH(r1)
+;...
+POP(r1)
+jmp(r1)
+
+
+
+; COMPLETO
+Comp:
+PUSH (r1)
+addu r29, r0, r0             ; r29 <- 0
+ld r10, r30, 4               ; r10 <- IMG1
+ld r11, r30, 8               ; r11 <- IMG2
+ld r20, r10, 0               ; r20 <- filas
+ld r21, r10, 4               ; r21 <- columnas
+addu r10, r10, 8             ; r10 <- dirección del primer elemento de IMG1
+addu r11, r11, 8             ; r11 <- dirección del primer elemento de IMG2
+mulu r12, r20, r21           ; r12 <- filas*columnas
+or r13, r0, r0               ; i <- 0
+
+BUCLECOMP:
+cmp r3, r13, r12             ;
+bb1 ge, r3, SALIRCOMP        ; while (i < filas*columnas) {
+ld.bu r4, r10, r13           ;   r4 <- pixel i de IMG1
+ld.bu r5, r11, r13           ;   r5 <- pixel i de IMG2
+cmp r3, r4, r5               ;   
+bb1 gt, r3, NOSUMACOMP       ;   si r4 <= r5, entonces intercambiar r4 con r5
+or r6, r4, r4
+or r4, r5, r5
+or r5, r6, r6
+NOSUMACOMP:
+subu r6, r4, r5              ;   r6 <- abs(r4 - r5)
+addu r29, r29, r6            ;   r29 <- r29 + r6
+addu r13, r13, 1             ;   i++
+br BUCLECOMP                 ; }
+
+SALIRCOMP:
+POP (r1)
+jmp (r1)
+
+
+
+Filtro:
+PUSH(r1)
+;...
+POP(r1)
+jmp(r1)
+
+
+
+FilPixel:
+PUSH(r1)
+;...
+POP(r1)
+jmp(r1)
+
+
+
+SubMatriz:
+PUSH(r1)
+PUSH(r31)
+
+POP(r31)
+POP(r1)
+jmp(r1)
+
+
+
+ValorPixel:
+PUSH(r1)
+PUSH(r31)
+or r31,r30,r30    ;Igualmos r31 a r30
+or r29,r0,r0      ;Inicializamos ACC a 0
+ld r16,r31,8      ;Inicializamos SubImg
+ld r17,r31,12     ;Inicializamos MFiltro
+ld r21,r17,0      ;En r21 tenemos K
+ld r22,r17,4      ;En r22 tenemos C
+ld r23,r17,8      ;En r23 tenemos B
+or r28,r0,r0      ;En r28 contador
+BUCLE:cmp r3,r28,9
+bb1 eq,r3,SaleBucle
+ld.bu r20,r16,r28
+cmp r3,r28,4
+bb1 eq,r3,EsCentro
+mulu r20,r20,r23
+br NoEsCentro
+EsCentro:mulu r20,r20,r22
+NoEsCentro: addu r29,r29,r20
+addu r28,r28,1
+br BUCLE
+SaleBucle:divu r29,r29,r21
+cmp r3,r29,0
+bb1 lt,r3,EsMenor
+cmp r3,r29,255
+bb1 gt,r3,EsMayor
+br SaleDelTodo
+EsMenor:or r29,r0,r0
+br SaleDelTodo
+EsMayor:or r29,r0,255
+SaleDelTodo:
+or r30,r31,r31
+POP(r31)
+POP(r1)
+jmp(r1)

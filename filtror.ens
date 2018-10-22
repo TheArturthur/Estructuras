@@ -12,12 +12,16 @@ POP: MACRO (reg)
 	ld reg, r30, 0
 	addu r30, r30, 4
 ENDMACRO
+LEA: MACRO(reg, dato)
+	or reg, r0, low(dato)
+	or.u reg, reg, high(dato)
+ENDMACRO
 
 nF: data 0
 
 NFiltrados:					;nFiltrados (oper)
-	PUSH	r1
-	PUSH	r31
+	PUSH	(r1)
+	PUSH	(r31)
 	ld		r02, r30, r0	; r2 <- oper
 	ld		r04, r0, r0		; r4 <- nF
 	cmp		r05, r02, r0
@@ -46,5 +50,5 @@ NF_NEG:
 
 FIN:
 	or 		r29, r04, r00; r29 <- r4 (res)
-	POP		r31
-	POP		r1
+	POP		(r31)
+	POP		(r1)

@@ -1,0 +1,18 @@
+; Macros:
+swap: MACRO(ra,rb)
+	or r1,ra,ra
+	or ra,rb,rb
+	or rb,r1,r1
+ENDMACRO
+PUSH: MACRO (reg)
+	subu r30, r30, 4
+	st ra, r30, 0
+ENDMACRO
+POP: MACRO (reg)
+	ld ra, r30, 0
+	addu r30, r30, 4
+ENDMACRO
+LEA: MACRO(reg, dato)
+	or reg, r0, low(dato)
+	or.u reg, reg, high(dato)
+ENDMACRO

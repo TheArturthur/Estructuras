@@ -1,6 +1,26 @@
+; Macros:
+swap: MACRO(ra,rb)
+	or r1,ra,ra
+	or ra,rb,rb
+	or rb,r1,r1
+ENDMACRO
+PUSH: MACRO (reg)
+	subu r30, r30, 4
+	st reg, r30, 0
+ENDMACRO
+POP: MACRO (reg)
+	ld reg, r30, 0
+	addu r30, r30, 4
+ENDMACRO
+LEA: MACRO(reg, dato)
+	or reg, r0, low(dato)
+	or.u reg, reg, high(dato)
+ENDMACRO
+
+
 nFiltrados:	;nFiltrados (oper)
-	PUSH	r01
-	PUSH	r31
+	PUSH	(r1)
+	PUSH	(r31)
 	ld		r02, r30, r00	; r2 <- oper
 	ld		r04, r00, r00	; r4 <- nF
 	cmp		r05, r02, r00
@@ -29,5 +49,5 @@ NF_NEG:
 
 FIN:
 	or 		r29, r04, r00; r29 <- r4 (res)
-	POP		r31
-	POP		r1
+	POP		(r31)
+	POP		(r1)

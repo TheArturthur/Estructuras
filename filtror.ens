@@ -17,7 +17,6 @@ LEA: MACRO(reg, dato)
 	or.u reg, reg, high(dato)
 ENDMACRO
 
-nF: data 0
 
 NFiltrados:					;nFiltrados (oper)
 	PUSH	(r1)
@@ -52,3 +51,4 @@ FIN:
 	or 		r29, r04, r00; r29 <- r4 (res)
 	POP		(r31)
 	POP		(r1)
+

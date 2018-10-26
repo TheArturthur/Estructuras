@@ -18,37 +18,57 @@ LEA: MACRO(reg, dato)
 ENDMACRO
 
 
-NFiltrados:					;nFiltrados (oper)
-	PUSH	(r1)
-	PUSH	(r31)
+nFiltrados:					;nFiltrados (oper)
+	or 		r29, r0, r0		; r29 = 0 (inicializar)
 	ld		r02, r30, r0	; r2 <- oper
 	ld		r04, r0, r0		; r4 <- nF
 	cmp		r05, r02, r0
-	
+
 	;Si oper >= 0:
 	bb1		ge, r05, OPER_POS
-	
+
 	;Si oper < 0:
 	subu	r04, r04, 1
-	st		r04, r00, r00	; nF = nF + 1
-	cmp		r05, r04, r00
-	
+	st		r04, r0, r0	; nF = nF + 1
+	cmp		r05, r04, r0
+
 	;Si nF < 0:
 	bb1		lt, r5, NF_NEG
 	bsr		FIN
 
 OPER_POS:
-	st		r02, r00, r00; nF = oper
-	or 		r04, r02, r00; r4 <- oper
+	st		r02, r0, r0; nF = oper
+	or 		r04, r02, r0; r4 <- oper
 	bsr		FIN
 
 NF_NEG:
-	st		r00, r00, r00; nF = 0
-	or 		r04, r00, r00; r4 <- nF
+	st		r00, r0, r0; nF = 0
+	or 		r04, r0, r0; r4 <- nF
 	bsr		FIN
 
 FIN:
-	or 		r29, r04, r00; r29 <- r4 (res)
-	POP		(r31)
-	POP		(r1)
+	or 		r29, r04, r0; r29 <- r4 (res)
+	jmp		(r1)
 
+Comp:
+	jmp		(r1)
+
+
+ActualizaFiltro:
+	jmp		(r1)
+
+
+FiltRec:
+	jmp		(r1)
+
+SubMatriz:
+	jmp		(r1)
+
+ValorPixel:
+	jmp		(r1)
+
+FilPixel:
+	jmp		(r1)
+
+Filtro:
+	jmp		(r1)

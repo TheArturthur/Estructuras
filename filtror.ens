@@ -17,8 +17,11 @@ LEA: MACRO(reg, dato)
 	or.u reg, reg, high(dato)
 ENDMACRO
 
+;Datos para pruebas:
 
-nFiltrados:					;nFiltrados (oper)
+
+
+nFiltrados:						;nFiltrados (oper)
 	or 		r29, r0, r0		; r29 = 0 (inicializar)
 	ld		r02, r30, r0	; r2 <- oper
 	ld		r04, r0, r0		; r4 <- nF
@@ -60,11 +63,14 @@ Comp:
 	ld		r11, r04, r0	; r11 <- M1
 	ld		r12, r06, r0	; r12 <- M2
 
-	mulu	r08, r11, r08
-	mulu	r10, r12, r10
+	mulu	r08, r11, r08	; r8 <- M1*N1
+	mulu	r10, r12, r10	; r10 <- M2*N2
 	cmp		r03, r08, r10
+
+; Si tienen distinto tamaño => FIN
 	bb1		ne, r03, FIN_cmp
 
+; Si los tamaños son iguales:
 COMPARA:
 	or		r11, r04, 8		; r11 <-Dato1_Im1
 	or		r12, r06, 8		; r12 <-Dato1_Im2
@@ -76,10 +82,10 @@ COMPARA:
 	cmp		r03, r08, r0
 	bb1		gt, r03, COMPARA
 
-	jmp		(r1)
-
 FIN_cmp:
 	divu	r29, r02, r8
+	jmp		(r1)
+
 
 ActualizaFiltro:
 

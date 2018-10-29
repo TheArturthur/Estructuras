@@ -30,8 +30,8 @@ PUSH (r10)
 nFiltrados:						;nFiltrados (oper)
 	PUSH	(r1)
 	or 		r29, r0, r0		; r29 = 0 (inicializar)
-	ld		r02, r30, 0	; r2 <- oper
-	ld		r04, r0, r0		; r4 <- nF
+	ld		r02, r30, 4	; r2 <- oper
+	ld		r04, r0, r0		; r4 <- nF (nF esta en la dir 0)
 	cmp		r05, r02, r0
 
 	;Si oper >= 0:
@@ -43,15 +43,15 @@ nFiltrados:						;nFiltrados (oper)
 
 	;Si nF < 0:
 	bb1		lt, r5, NF_NEG
-	bsr		FIN_nF
+	br		FIN_nF
 
 OPER_POS:
 	or 		r04, r02, r0; r4 <- oper
-	bsr		FIN_nF
+	br		FIN_nF
 
 NF_NEG:
 	and		r04, r0, r0; r4 <- nF
-	bsr		FIN_nF
+	br		FIN_nF
 
 FIN_nF:
 	or 		r29, r04, r0; r29 <- r4 (res)
@@ -59,10 +59,11 @@ FIN_nF:
 	jmp		(r1)
 
 Comp:
+	PUSH	(r1)
 	or		r02, r0, r0 	; Dif = 0
 	or		r29, r0, r0		; r29 = 0
-	ld		r04, r30, 0		; dir Im1
-	ld		r06, r30, 4		; dir Im2
+	ld		r04, r30, 4		; dir Im1
+	ld		r06, r30, 8		; dir Im2
 	ld		r08, r04, 4		; r8 <- N1
 	ld		r10, r06, 4		; r10 <- N2
 	ld		r11, r04, r0	; r11 <- M1
@@ -88,12 +89,40 @@ COMPARA:
 	bb1		gt, r03, COMPARA
 
 FIN_cmp:
-	divu	r29, r02, r8
+	divu	r02, r02, r8	; r2 (Dif) = Dif / M*N
+	or		r29, r02, r0	; r29 <- Dif
+	POP		(r1)
 	jmp		(r1)
 
 
-ActualizaFiltro:
+ActualizaFiltro:			;ActualizaFiltro (MFiltro, ModFiltro)
+	PUSH	(r1)
+	ld		r02, r30, 4		; ModFiltro
+	ld		r04, r30, 8		; MFiltro
+	ld		r06, r02, 0		; r6 <- numerador
+	ld		r08, r02, 4		; r8 <- denominador
+	muls	r10, r06, r08	; r10 = numerador * denominador
+	cmp		r03, r10, r0
+	;Si numerador * denominador = 0, uno de los dos (o ambos) es nulo:
+	bb1		eq, r03, FIN_ACTF
+	;Si no es cero, ninguno es nulo:
+	or		r09, r0, r0		; Contador
+	or		r11, r02, r0	; Puntero
 
+BUC_ACTF:
+	ld		r12, r11, 0		; r12 <- dato Matriz
+	muls	r13, r12, r6	; r13 <- dato * numerador
+	divs	r14, r13, r8	; r14 <- dato * numerador / denominador
+	st		r14, r11, 0		; r14 <- puntero (devuelve dato)
+	addu	r09, r09, 1		; contador = contador + 1
+	addu	r11, r11, 4		; actualiza puntero
+	cmp		r05, r09, 8
+	; Si faltan datos en la matriz por actualizar, repite con el siguiente:
+	bb1		le, r05, BUC_ACTF
+	; Si no faltan datos, termina:
+
+FIN_ACTF:
+	POP		(r1)
 	jmp		(r1)
 
 

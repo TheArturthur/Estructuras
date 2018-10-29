@@ -18,12 +18,19 @@ LEA: MACRO(reg, dato)
 ENDMACRO
 
 ;Datos para pruebas:
+org 0
+nF: data 100
 
+or	r30, r0, 2000
+or r31, r30, r30
 
+addu	r10, r0, 3
+PUSH (r10)
 
 nFiltrados:						;nFiltrados (oper)
+	PUSH	(r1)
 	or 		r29, r0, r0		; r29 = 0 (inicializar)
-	ld		r02, r30, r0	; r2 <- oper
+	ld		r02, r30, 0	; r2 <- oper
 	ld		r04, r0, r0		; r4 <- nF
 	cmp		r05, r02, r0
 
@@ -32,7 +39,6 @@ nFiltrados:						;nFiltrados (oper)
 
 	;Si oper < 0:
 	subu	r04, r04, 1
-	st		r04, r0, r0	; nF = nF + 1
 	cmp		r05, r04, r0
 
 	;Si nF < 0:
@@ -40,17 +46,16 @@ nFiltrados:						;nFiltrados (oper)
 	bsr		FIN_nF
 
 OPER_POS:
-	st		r02, r0, r0; nF = oper
 	or 		r04, r02, r0; r4 <- oper
 	bsr		FIN_nF
 
 NF_NEG:
-	st		r00, r0, r0; nF = 0
-	or 		r04, r0, r0; r4 <- nF
+	and		r04, r0, r0; r4 <- nF
 	bsr		FIN_nF
 
 FIN_nF:
 	or 		r29, r04, r0; r29 <- r4 (res)
+	POP		(r1)
 	jmp		(r1)
 
 Comp:

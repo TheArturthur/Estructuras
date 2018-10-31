@@ -1,5 +1,5 @@
 ; Macros:
-swap: MACRO(ra,rb)
+swap: MACRO	(ra,rb)
 	or r1,ra,ra
 	or ra,rb,rb
 	or rb,r1,r1
@@ -12,26 +12,141 @@ POP: MACRO (reg)
 	ld reg, r30, 0
 	addu r30, r30, 4
 ENDMACRO
-LEA: MACRO(reg, dato)
-	or reg, r0, low(dato)
-	or.u reg, reg, high(dato)
+DBNZ: MACRO	(reg, ETIQ)
+  sub    reg, reg, 1
+  cmp    r3, reg, r0
+  bb1    ne, r3, ETIQ
+ENDMACRO
+LEA: MACRO	(reg, ETIQ)
+	or reg, r0, low(ETIQ)
+	or.u reg, reg, high(ETIQ)
 ENDMACRO
 
-;Datos para pruebas:
+
+;
+; ---------------------------------------------> Datos para pruebas
+;
+;Pruebas nFiltrados:
 org 0
-nF: data 100
+nF: data 0
 
-or	r30, r0, 2000
-or r31, r30, r30
+org 1000
+;Pruebas Comp:
 
-addu	r10, r0, 3
-PUSH (r10)
+Imagen1_data: data 3, 3
+  data	1, 1, 1
+  data	1, 1, 1
+  data	1, 1, 1
 
-nFiltrados:						;nFiltrados (oper)
+Imagen2_data: data 3, 3
+  data	1, 1, 1
+  data	1, 1, 1
+  data	1, 1, 1
+
+;Pruebas ActualizaFiltro:
+
+Mfiltro_data:
+  data	2, 2, 2
+  data	2, 2, 2
+  data	2, 2, 2
+
+Modfiltro_data: data 0, 0 ; Dupla
+
+;Pruebas SubMatriz:
+
+Imagen_data2: data 3,5
+  data	0x04030201
+  data	0x05030505
+  data	0x03010503
+  data	0x00090705
+
+SubImg_data: data  3
+	data	0x01020105
+  data	0x0A050610
+  data	0x00000000
+
+SubImg_res: res 12		; Reserva de espacio para almacenar SubImg
+;Pruebas ValorPixel:
+
+;Pruebas Filtro:
+
+;Pruebas FilPixel:
+
+;Pruebas FiltRec:
+
+org 0x10000
+
+PPAL:
+	jmp		(r1)
+
+PPALSubMatriz:
+  LEA		(r30,60000)					; Inicializacion del puntero de pila
+  or 		r2, r0, 2
+  PUSH	(r2)								; j=2
+  or 		r2,r0,1
+  PUSH	(r2) 								; i=1
+  LEA		(r2,SubImg_res)
+  PUSH	(r2)
+  LEA		(r2,Imagen1_data) 		; carga Matriz imagen
+  PUSH	(r2)
+  bsr 	SubMatriz
+  stop
+
+PPALnFiltrados:
+	LEA		(r30, 60000)				; inicializacion del puntero de pila
+  or 		r5, r0, 3						; cargas un valor oper
+  PUSH	(r5)								; lo metes en la pila
+  bsr 	nFiltrados 					; y llamas a nFiltrados
+  sub 	r5, r0,6
+  ;or r5,r0,-4  						; cargas un valor oper
+  PUSH	(r5)  							; lo metes en la pila
+  bsr 	nFiltrados
+  or 		r5, r0, 1
+  PUSH	(r5)
+  bsr 	nFiltrados
+  sub 	r5,r0,2
+  PUSH	(r5)
+  bsr 	nFiltrados
+  PUSH	(r5)
+  bsr 	nFiltrados 					; y llamas a nFiltrados
+  stop
+
+PPALComp:
+	LEA		(r30, 60000)
+	LEA		(r02, Imagen1_data)
+	PUSH	(r02)
+	LEA		(r02, Imagen2_data)
+	PUSH	(r02)
+	bsr		Comp
+	stop
+
+PPALActFiltro:
+	LEA		(r30, 60000)				; Inicializa puntero de pila en dir 0x60000
+	LEA		(r02, Mfiltro_data)	; Cargo Mfiltro_data en r2
+	PUSH	(r02)								; Y lo meto en la pila
+	LEA		(r02, Modfiltro_data)	; Cargo Modfiltro_data en r2
+	PUSH	(r02)								; Y lo meto en la pila
+	bsr		ActualizaFiltro
+	stop
+
+PPALVPixel:
+  LEA		(r30, 60000) 				; Inicializacion del puntero de pila
+  LEA		(r10, SubImg_data)	; carga de los datos
+  LEA		(r11, Mfiltro_data)	; de pruebas
+  PUSH	(r11)
+  PUSH	(r10)
+  bsr 	ValorPixel
+  stop
+
+;
+; ---------------------------------------------> Subrutinas:
+;
+org  3000
+nFiltrados:									; nFiltrados (oper)
 	PUSH	(r1)
-	or 		r29, r0, r0		; r29 = 0 (inicializar)
-	ld		r02, r30, 4	; r2 <- oper
-	ld		r04, r0, r0		; r4 <- nF (nF esta en la dir 0)
+	addu	r29, r0, r0					; r29 = 0 (inicializar)
+	ld		r02, r30, 4					; r2 <- oper
+	ld		r04, r0, r0					; r4 <- nF (nF esta en la dir 0)
 	cmp		r05, r02, r0
 
 	;Si oper >= 0:
@@ -46,31 +161,32 @@ nFiltrados:						;nFiltrados (oper)
 	br		FIN_nF
 
 OPER_POS:
-	or 		r04, r02, r0; r4 <- oper
+	or 		r04, r02, r0				; r4 <- oper
 	br		FIN_nF
 
 NF_NEG:
-	and		r04, r0, r0; r4 <- nF
+	and		r04, r0, r0					; r4 <- nF
 	br		FIN_nF
 
 FIN_nF:
-	or 		r29, r04, r0; r29 <- r4 (res)
+	or 		r29, r04, r0				; r29 <- r4 (res)
 	POP		(r1)
 	jmp		(r1)
 
-Comp:
+Comp:												; Comp (Img1, Img2)
 	PUSH	(r1)
-	or		r02, r0, r0 	; Dif = 0
-	or		r29, r0, r0		; r29 = 0
-	ld		r04, r30, 4		; dir Im1
-	ld		r06, r30, 8		; dir Im2
-	ld		r08, r04, 4		; r8 <- N1
-	ld		r10, r06, 4		; r10 <- N2
-	ld		r11, r04, r0	; r11 <- M1
-	ld		r12, r06, r0	; r12 <- M2
+	or		r02, r0, r0 				; Dif = 0
+	or		r29, r0, r0					; r29 = 0
+	ld		r04, r30, 4					; dir Im1
+	ld		r06, r30, 8					; dir Im2
+	ld		r08, r04, 4					; r8 <- N1
+	ld		r10, r06, 4					; r10 <- N2
+	ld		r11, r04, r0				; r11 <- M1
+	ld		r12, r06, r0				; r12 <- M2
 
-	mulu	r08, r11, r08	; r8 <- M1*N1
-	mulu	r10, r12, r10	; r10 <- M2*N2
+	mulu	r08, r11, r08				; r8 <- M1*N1
+	mulu	r10, r12, r10				; r10 <- M2*N2
+	addu	r14, r0, r0					; Contador para salir del bucle
 	cmp		r03, r08, r10
 
 ; Si tienen distinto tamaño => FIN
@@ -78,44 +194,45 @@ Comp:
 
 ; Si los tamaños son iguales:
 COMPARA:
-	or		r11, r04, 8		; r11 <-Dato1_Im1
-	or		r12, r06, 8		; r12 <-Dato1_Im2
+	or		r11, r04, 8					; r11 <-Dato1_Im1
+	or		r12, r06, 8					; r12 <-Dato1_Im2
 	sub		r13, r11, r12
 	muls	r13, r13, r13
 	add		r02, r02, r13
-	or		r11, r11, 4		; r11 <- r11+4 (Acutaliza puntero)
-	or		r12, r12, 4		; r12 <- r12+4 (Actualiza puntero)
-	cmp		r03, r08, r0
+	or		r11, r11, 4					; r11 <- r11+4 (Acutaliza puntero)
+	or		r12, r12, 4					; r12 <- r12+4 (Actualiza puntero)
+	addu	r14, r14, 1					; Contador = contador + 1
+	cmp		r03, r14, r08
 	bb1		gt, r03, COMPARA
 
 FIN_cmp:
-	divu	r02, r02, r8	; r2 (Dif) = Dif / M*N
-	or		r29, r02, r0	; r29 <- Dif
+	divu	r02, r02, r8				; r2 (Dif) = Dif / M*N
+	or		r29, r02, r0				; r29 <- Dif
 	POP		(r1)
 	jmp		(r1)
 
 
-ActualizaFiltro:			;ActualizaFiltro (MFiltro, ModFiltro)
+ActualizaFiltro:						; ActualizaFiltro (MFiltro, ModFiltro)
 	PUSH	(r1)
-	ld		r02, r30, 4		; ModFiltro
-	ld		r04, r30, 8		; MFiltro
-	ld		r06, r02, 0		; r6 <- numerador
-	ld		r08, r02, 4		; r8 <- denominador
-	muls	r10, r06, r08	; r10 = numerador * denominador
+	ld		r02, r30, 4					; ModFiltro
+	ld		r04, r30, 8					; MFiltro
+	ld		r06, r02, 0					; r6 <- numerador
+	ld		r08, r02, 4					; r8 <- denominador
+	muls	r10, r06, r08				; r10 = numerador * denominador
 	cmp		r03, r10, r0
 	;Si numerador * denominador = 0, uno de los dos (o ambos) es nulo:
 	bb1		eq, r03, FIN_ACTF
 	;Si no es cero, ninguno es nulo:
-	or		r09, r0, r0		; Contador
-	or		r11, r02, r0	; Puntero
+	addu		r09, r0, r0				; Contador
+	or		r11, r04, r0				; Puntero
 
 BUC_ACTF:
-	ld		r12, r11, 0		; r12 <- dato Matriz
-	muls	r13, r12, r6	; r13 <- dato * numerador
-	divs	r14, r13, r8	; r14 <- dato * numerador / denominador
-	st		r14, r11, 0		; r14 <- puntero (devuelve dato)
-	addu	r09, r09, 1		; contador = contador + 1
-	addu	r11, r11, 4		; actualiza puntero
+	ld		r12, r11, 0					; r12 <- dato Matriz
+	muls	r13, r12, r6				; r13 <- dato * numerador
+	divs	r14, r13, r8				; r14 <- dato * numerador / denominador
+	st		r14, r11, 0					; r14 <- puntero (devuelve dato)
+	addu	r09, r09, 1					; contador = contador + 1
+	addu	r11, r11, 4					; actualiza puntero
 	cmp		r05, r09, 8
 	; Si faltan datos en la matriz por actualizar, repite con el siguiente:
 	bb1		le, r05, BUC_ACTF
@@ -129,22 +246,22 @@ FIN_ACTF:
 FiltRec:
 	jmp		(r1)
 
-SubMatriz: 						; SubMatriz (Img, SubImg, i, j)
+SubMatriz: 									; SubMatriz (Img, SubImg, i, j)
 	PUSH	(r1)
 	;Carga de datos en registros:
-	ld		r02, r30, 8		; r2 <- i
-	ld		r04, r30, 4		; r4 <- j
-	ld		r06, r30, 16	; r6 <- Img (dir)
-	ld		r08, r30, 12	; r8 <- SubImg (dir)
-	ld		r10, r08, 0		; r10 <- M
-	ld		r11, r08, 4		; r11 <- N
-	mulu	r15, r02, r11	; r15 <- i * N
-	addu	r15, r15, r04	; r15 <- i * N + j
-	addu	r16, r0, r0		; r16 <- 0 (contador para elementos de SubImg que quedan por copiar)
+	ld		r02, r30, 8					; r2 <- i
+	ld		r04, r30, 4					; r4 <- j
+	ld		r06, r30, 16				; r6 <- Img (dir)
+	ld		r08, r30, 12				; r8 <- SubImg (dir)
+	ld		r10, r08, 0					; r10 <- M
+	ld		r11, r08, 4					; r11 <- N
+	mulu	r15, r02, r11				; r15 <- i * N
+	addu	r15, r15, r04				; r15 <- i * N + j
+	addu	r16, r0, r0					; r16 <- 0 (contador para elementos de SubImg que quedan por copiar)
 	;Operaciones para comprobaciones de i y de j:
-	mulu	r12, r02, r04	; r12 <- i*j
-	subu	r13, r10, 1		; r13 <- M-1
-	subu	r14, r11, 1		; r14 <- N-1
+	mulu	r12, r02, r04				; r12 <- i*j
+	subu	r13, r10, 1					; r13 <- M-1
+	subu	r14, r11, 1					; r14 <- N-1
 	cmp		r03, r12, 0
 	;Si i*j=0 => i=0 y/o j=0 => elemento en borde
 	bb1		eq, r03, SM_EXTR
@@ -158,18 +275,18 @@ SubMatriz: 						; SubMatriz (Img, SubImg, i, j)
 	bb1		eq, r07, SM_EXTR
 
 SM_N_EXTR:
-	addu	r17, r06, 8		; r17 <- r6 + 8
-	ld		r18, r17, r16	;	r18 <- r17 + r16 (dato + despl)
-	addu	r16, r16, 1		; r16 <- r16 + 1 (actualizar contador)
+	addu	r17, r06, 8					; r17 <- r6 + 8
+	ld		r18, r17, r16				;	r18 <- r17 + r16 (dato + despl)
+	addu	r16, r16, 1					; r16 <- r16 + 1 (actualizar contador)
 	cmp		r03, r16, 8
 	;Si r16 <= 8, siguiente iteracion:
 	bb1		le, r03, SM_N_EXTR
 	;Si r16 > 8, FIN_SM
 	br		FIN_SM
 
-SM_EXTR:							; Bucle para copiar elemento en SubImg (dato en borde)
-	st		r15, r08, r16		; r15 -> M(r8+r16), siendo r16 el despl junto a contador
-	addu	r16, r16, 1		; r16 <- r16 + 1 (contador de elementos para salir del bucle)
+SM_EXTR:										; Bucle para copiar elemento en SubImg (dato en borde)
+	st		r15, r08, r16				; r15 -> M(r8+r16), siendo r16 el despl junto a contador
+	addu	r16, r16, 1					; r16 <- r16 + 1 (contador de elementos para salir del bucle)
 	cmp		r03, r16, 8
 	;Si r16 <= 8, quedan elementos por copiar, salta a siguiente iteracion:
 	bb1		le, r03, SM_EXTR

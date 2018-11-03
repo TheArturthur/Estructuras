@@ -1,5 +1,5 @@
 ; Macros:
-swap: MACRO	(ra,rb)
+SWAP: MACRO	(ra,rb)
 	or r1,ra,ra
 	or ra,rb,rb
 	or rb,r1,r1
@@ -100,15 +100,15 @@ PPALnFiltrados:
   sub 	r5, r0,6
   ;or r5,r0,-4  						; cargas un valor oper
   PUSH	(r5)  							; lo metes en la pila
-  bsr 	nFiltrados
-  or 		r5, r0, 1
+  bsr 	nFiltrados					; y llamas a nFiltrados
+  or 		r5, r0, 1						; .....
   PUSH	(r5)
   bsr 	nFiltrados
   sub 	r5,r0,2
   PUSH	(r5)
   bsr 	nFiltrados
   PUSH	(r5)
-  bsr 	nFiltrados 					; y llamas a nFiltrados
+  bsr 	nFiltrados
   stop
 
 PPALComp:

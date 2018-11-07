@@ -28,7 +28,7 @@ ENDMACRO
 ;
 ;Pruebas nFiltrados:
 org 0
-nF: data 0
+nF: data 6
 
 org 1000
 ;Pruebas Comp:
@@ -94,21 +94,26 @@ PPALSubMatriz:
 
 PPALnFiltrados:
 	LEA		(r30, 60000)				; inicializacion del puntero de pila
-  or 		r5, r0, 3						; cargas un valor oper
-  PUSH	(r5)								; lo metes en la pila
-  bsr 	nFiltrados 					; y llamas a nFiltrados
-  sub 	r5, r0,6
-  ;or r5,r0,-4  						; cargas un valor oper
-  PUSH	(r5)  							; lo metes en la pila
-  bsr 	nFiltrados
-  or 		r5, r0, 1
-  PUSH	(r5)
-  bsr 	nFiltrados
-  sub 	r5,r0,2
-  PUSH	(r5)
-  bsr 	nFiltrados
-  PUSH	(r5)
-  bsr 	nFiltrados 					; y llamas a nFiltrados
+  ; or 		r5, r0, 3						; cargas un valor oper
+  ; PUSH	(r5)								; lo metes en la pila
+  ; bsr 	nFiltrados 					; y llamas a nFiltrados
+  ; sub 	r5, r0, 6
+	; PUSH	(r5)
+	; bsr		nFiltrados
+  ; or 		r5, r0, -4  						; cargas un valor oper
+  ; PUSH	(r5)  							; lo metes en la pila
+  ; bsr 	nFiltrados
+  ; or 		r5, r0, 1
+  ; PUSH	(r5)
+  ; bsr 	nFiltrados
+  ; sub 	r5, r0, 2
+  ; PUSH	(r5)
+  ; bsr 	nFiltrados
+  ; PUSH	(r5)
+  ; bsr 	nFiltrados 					; y llamas a nFiltrados
+	add		r5, r0, -5
+	PUSH	(r5)
+	bsr		nFiltrados
   stop
 
 PPALComp:
@@ -145,31 +150,35 @@ org  3000
 nFiltrados:									; nFiltrados (oper)
 	PUSH	(r1)
 	addu	r29, r0, r0					; r29 = 0 (inicializar)
-	ld		r02, r30, 4					; r2 <- oper
-	ld		r04, r0, r0					; r4 <- nF (nF esta en la dir 0)
-	cmp		r05, r02, r0
+	ld		r02, r0, r0					; r2 <- nF (nF esta en la dir 0)
+	ld		r04, r30, 4					; r4 <- oper
+	cmp		r05, r04, r0
 
 	;Si oper >= 0:
 	bb1		ge, r05, OPER_POS
 
 	;Si oper < 0:
-	subu	r04, r04, 1
-	cmp		r05, r04, r0
+	subu	r02, r02, 1					; r2 <- r2 - 1
+	st		r02, r0, r0					; r2 -> M(0x0000), nF--
+	addu	r06, r02, r0				; r6 <- r2
+	cmp		r03, r02, r0
 
 	;Si nF < 0:
-	bb1		lt, r5, NF_NEG
+	bb1		lt, r03, NF_NEG
 	br		FIN_nF
 
 OPER_POS:
-	or 		r04, r02, r0				; r4 <- oper
+	st		r04, r0, r0					; r4 -> M(0x0000) <=> nF = oper
+	addu	r06, r04, r0				; r6 <- oper
 	br		FIN_nF
 
 NF_NEG:
-	and		r04, r0, r0					; r4 <- nF
+	st		r0, r0, r0					; r0 -> M(0x0000) <=> nF = 0
+	addu	r06, r0, r0					; r6 <- 0
 	br		FIN_nF
 
 FIN_nF:
-	or 		r29, r04, r0				; r29 <- r4 (res)
+	or 		r29, r06, r0				; r29 <- r6 (res)
 	POP		(r1)
 	jmp		(r1)
 

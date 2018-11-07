@@ -1,5 +1,5 @@
 ; Macros:
-swap: MACRO	(ra,rb)
+SWAP: MACRO	(ra,rb)
 	or r1,ra,ra
 	or ra,rb,rb
 	or rb,r1,r1
@@ -94,6 +94,7 @@ PPALSubMatriz:
 
 PPALnFiltrados:
 	LEA		(r30, 60000)				; inicializacion del puntero de pila
+<<<<<<< HEAD
   ; or 		r5, r0, 3						; cargas un valor oper
   ; PUSH	(r5)								; lo metes en la pila
   ; bsr 	nFiltrados 					; y llamas a nFiltrados
@@ -114,6 +115,23 @@ PPALnFiltrados:
 	add		r5, r0, -5
 	PUSH	(r5)
 	bsr		nFiltrados
+=======
+  or 		r5, r0, 3						; cargas un valor oper
+  PUSH	(r5)								; lo metes en la pila
+  bsr 	nFiltrados 					; y llamas a nFiltrados
+  sub 	r5, r0,6
+  ;or r5,r0,-4  						; cargas un valor oper
+  PUSH	(r5)  							; lo metes en la pila
+  bsr 	nFiltrados					; y llamas a nFiltrados
+  or 		r5, r0, 1						; .....
+  PUSH	(r5)
+  bsr 	nFiltrados
+  sub 	r5,r0,2
+  PUSH	(r5)
+  bsr 	nFiltrados
+  PUSH	(r5)
+  bsr 	nFiltrados
+>>>>>>> 27508737f608da63cfc88add6c9e17e30cfdfab0
   stop
 
 PPALComp:

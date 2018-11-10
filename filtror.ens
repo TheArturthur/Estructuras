@@ -46,9 +46,9 @@ Imagen2_data: data 3, 3
 ;Pruebas ActualizaFiltro:
 
 Mfiltro_data:
-  data	1, 0, 0
-  data	0, 1, 0
-  data	0, 0, 1
+  data	0x01010101
+  data	0x01010100
+  data	0x00000001
 
 Modfiltro_data: data 0, 0 ; Dupla
 
@@ -153,8 +153,8 @@ PPALVPixel:
   LEA		(r30, 60000) 				; Inicializacion del puntero de pila
   LEA		(r10, SubImg_data)	; carga de los datos
   LEA		(r11, Mfiltro_data)	; de pruebas
-  PUSH	(r11)
   PUSH	(r10)
+  PUSH	(r11)
   bsr 	ValorPixel
   stop
 
@@ -329,24 +329,21 @@ FIN_SM:
 
 ValorPixel:									; ValorPixel (SubImg, MFiltro)
 	PUSH	(r1)
-	or		r02, r0, r0					; r2 <- ACC = 0
+	or		r2, r0, r0					; r2 <- ACC = 0
 	or		r29, r0, r0					; r29 <- res = 0
-	ld		r04, r30, 8					; r04 <- SubImg
-	ld		r06, r30, 4					; r06 <- MFiltro
-	addu	r08, r0, r0					; r8 <- 0 (Contador + puntero SubImg)
-	addu	r10, r0, r0					; r10 <- 0 (Puntero MFiltro)
+	ld		r4, r30, 4					; r4 <- dir SubImg
+	ld		r6, r30, 8					; r6 <- dir MFiltro
+	addu	r8, r0, 8						; r8 <- Contador de elementos por filtrar
 
-BUC_VP:
-	ld		r11, r04, r08				; r11 <- datoSubImg
-	ld		r12, r06, r10				; r12 <- datoMFiltro
-	muls	r13, r11, r12				; r13 <- datoSubImg * datoMFiltro
-	add		r02, r02, r13				; ACC = ACC + r13
-	addu	r08, r08, 4					; Actualización puntero
-	addu	r10, r10, 4					; Actualización puntero
-	cmp		r03, r08, 9
-	bb1		lt, r03, BUC_VP
-
-	or		r29, r02, r0
+BUC_VPixel:
+	ld.b	r10, r4, 0					; r10 <- dato SubImg
+	ld.b	r11, r6, 0					; r11 <- dato Mfiltro
+	muls	r12, r10, r11				; r12 <- dato_SubImg * dato_MFiltro
+	add		r2, r2, r12					; ACC = ACC + r12
+	addu	r4, r4, 1						; Actualiza puntero SubImg
+	addu	r6, r6, 1						; Actualiza puntero MFiltro
+	DBNZ	(r8, BUC_VPixel)
+	or		r29, r2, 0					; r29 <- ACC
 	POP		(r1)
 	jmp		(r1)
 

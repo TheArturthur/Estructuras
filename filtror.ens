@@ -94,7 +94,6 @@ PPALSubMatriz:
 
 PPALnFiltrados:
 	LEA		(r30, 60000)				; inicializacion del puntero de pila
-<<<<<<< HEAD
   ; or 		r5, r0, 3						; cargas un valor oper
   ; PUSH	(r5)								; lo metes en la pila
   ; bsr 	nFiltrados 					; y llamas a nFiltrados
@@ -115,7 +114,6 @@ PPALnFiltrados:
 	add		r5, r0, -5
 	PUSH	(r5)
 	bsr		nFiltrados
-=======
   or 		r5, r0, 3						; cargas un valor oper
   PUSH	(r5)								; lo metes en la pila
   bsr 	nFiltrados 					; y llamas a nFiltrados
@@ -131,7 +129,6 @@ PPALnFiltrados:
   bsr 	nFiltrados
   PUSH	(r5)
   bsr 	nFiltrados
->>>>>>> 27508737f608da63cfc88add6c9e17e30cfdfab0
   stop
 
 PPALComp:
@@ -206,10 +203,10 @@ Comp:												; Comp (Img1, Img2)
 	or		r29, r0, r0					; r29 = 0
 	ld		r04, r30, 4					; dir Im1
 	ld		r06, r30, 8					; dir Im2
+	ld		r11, r04, 0					; r11 <- M1
 	ld		r08, r04, 4					; r8 <- N1
+	ld		r12, r06, 0					; r12 <- M2
 	ld		r10, r06, 4					; r10 <- N2
-	ld		r11, r04, r0				; r11 <- M1
-	ld		r12, r06, r0				; r12 <- M2
 
 	mulu	r08, r11, r08				; r8 <- M1*N1
 	mulu	r10, r12, r10				; r10 <- M2*N2
@@ -219,22 +216,26 @@ Comp:												; Comp (Img1, Img2)
 	bb1		ne, r03, FIN_cmp
 
 ; Si los tamaños son iguales:
-	addu	r14, r0, 8					; Puntero
-	addu	r15, r0, r0					; Contador
+	addu	r04, r04, 8					;	r4 <- dir primer elemento Im1
+	addu	r06, r06, 8					;	r6 <- dir primer elemento Im2
+	addu	r16, r0, r0					; Contador con elementos comparados
+
 COMPARA:
-	ld		r11, r04, r14				; r11 <-Dato1_Im1
-	ld		r12, r06, r14				; r12 <-Dato1_Im2
+	ld.b	r11, r04, r14				; r11 <- Dato1_Im1
+	ld.b	r12, r06, r14				; r12 <- Dato1_Im2
 	sub		r13, r12, r11
 	muls	r13, r13, r13
-	add		r02, r02, r13
-	addu	r14, r14, 1					; r11 <- r11 + 1 (Actualiza puntero)
-	addu	r15, r15, 1					; r15 <- r15 + 1 (Actualiza contador)
-	cmp		r05, r15, r08
-	bb1		lt, r05, COMPARA
+	add		r02, r02, r13				; Dif = Dif + (Dato_Im1-Dato_Im2)^2
+	addu	r04, r04, 1					; r4 <- r4 + 1 (Actualiza puntero)
+	addu	r05, r05, 1					; r5 <- r5 + 1 (Actualiza puntero)
+	addu	r16, r16, 1					; Act. contador elementos comparados
+	cmp		r03, r16, r08
+	bb1		lt, r03, COMPARA		; Si quedan elementos por comparar, repite
 
 FIN_cmp:
-	divu	r02, r02, r8				; r2 (Dif) = Dif / M*N
+	divu	r02, r02, r8				; Dif = Dif / M*N
 	or		r29, r02, r0				; r29 <- Dif
+	or		r02, r0, r0					; r2 <- 0
 	POP		(r1)
 	jmp		(r1)
 
@@ -276,15 +277,17 @@ FiltRec:
 SubMatriz: 									; SubMatriz (Img, SubImg, i, j)
 	PUSH	(r1)
 	;Carga de datos en registros:
-	ld		r02, r30, 8					; r2 <- i
-	ld		r04, r30, 4					; r4 <- j
-	ld		r06, r30, 16				; r6 <- Img (dir)
-	ld		r08, r30, 12				; r8 <- SubImg (dir)
-	ld		r10, r08, 0					; r10 <- M
+	ld		r02, r30, 12				; r2 <- i
+	ld		r04, r30, 16				; r4 <- j
+	ld		r06, r30, 4					; r6 <- Img (dir)
+	ld		r08, r30, 8					; r8 <- SubImg (dir)
+	ld		r10, r08, r0				; r10 <- M
 	ld		r11, r08, 4					; r11 <- N
 	mulu	r15, r02, r11				; r15 <- i * N
 	addu	r15, r15, r04				; r15 <- i * N + j
-	addu	r16, r0, r0					; r16 <- 0 (contador para elementos de SubImg que quedan por copiar)
+	addu	r16, r0, 8					; r16 <- 9 (contador para elementos de SubImg que quedan por copiar)
+	addu	r17, r6, 8					; Primer elemento de Imagen
+	addu	r18, r17, r15				; Elemento central (Img[i,j])
 	;Operaciones para comprobaciones de i y de j:
 	mulu	r12, r02, r04				; r12 <- i*j
 	subu	r13, r10, 1					; r13 <- M-1
@@ -302,22 +305,22 @@ SubMatriz: 									; SubMatriz (Img, SubImg, i, j)
 	bb1		eq, r07, SM_EXTR
 
 SM_N_EXTR:
-	addu	r17, r06, 8					; r17 <- r6 + 8
-	ld		r18, r17, r16				;	r18 <- r17 + r16 (dato + despl)
-	addu	r16, r16, 1					; r16 <- r16 + 1 (actualizar contador)
-	cmp		r03, r16, 8
-	;Si r16 <= 8, siguiente iteracion:
-	bb1		le, r03, SM_N_EXTR
-	;Si r16 > 8, FIN_SM
+	subu	r19, r2, 1					; r19 <- i-1
+	subu	r20, r4, 1					; r20 <- j-1
+	mulu	r21, r19, r11				; r21 <- (i-1) * N
+	addu	r21, r19, r20				; r21 <- (i-1) * N + (j-1)
+	addu	r22, r17, r21				; r22 <- dir primer elemento a copiar (Img[i-1,j-1])
+	ld.b	r23, r22, 0					; r23 <- elemento a copiar
+	st.b	r23, r8, 0					; r23 -> M(r8+0)
+	addu	r8, r8, 1						; Actualizo el puntero de SubImg
+	addu	r22, r22, 1					; Actualizo el puntero de Img
+	DBNZ	(r16, SM_N_EXTR)		; Usamos DBNZ para iterar por los 9 elementos
 	br		FIN_SM
 
 SM_EXTR:										; Bucle para copiar elemento en SubImg (dato en borde)
-	st		r15, r08, r16				; r15 -> M(r8+r16), siendo r16 el despl junto a contador
-	addu	r16, r16, 1					; r16 <- r16 + 1 (contador de elementos para salir del bucle)
-	cmp		r03, r16, 8
-	;Si r16 <= 8, quedan elementos por copiar, salta a siguiente iteracion:
-	bb1		le, r03, SM_EXTR
-	;Si r16 > 8, no quedan elementos, salta a FIN:
+	st.b	r18, r8, 0					; Copiamos el elemento central en el primer hueco de SubImg
+	addu	r8, r8, 1						; Actualizamos el puntero al siguiente elemento
+	DBNZ	(r16, SM_EXTR)			; Usamos DBNZ para iterar por los nueve elementos de SubImg
 	br		FIN_SM
 
 FIN_SM:

@@ -1,0 +1,555 @@
+;En primer lugar definimos las Macros PUSH, POP, LEA y DBNZ
+PUSH:     MACRO  (reg)
+          subu   r30, r30, 4
+          st     reg, r30, r0
+          ENDMACRO
+POP:      MACRO  (reg)
+          ld     reg, r30, r0
+          addu   r30, r30, 4
+          ENDMACRO
+LEA:      MACRO  (reg, ETIQ)
+          or     reg, r0,  low(ETIQ)
+          or.u   reg, reg, high(ETIQ)
+          ENDMACRO
+DBNZ:     MACRO  (reg, ETIQ)
+          sub    reg, reg, 1
+          cmp    r27, reg, 0
+          bb0    eq, r27, ETIQ
+          ENDMACRO
+org 1000
+;Prueba para funcionamiento de COMP (propia)
+PPAL: LEA(r30,0x0000F000)
+    LEA(r3,IMAGEN2);
+    PUSH(r3);
+    LEA(r3,IMAGEN1);
+    PUSH(r3);
+    bsr Comp;
+    addu r30,r30,8;
+    stop
+  ;Llama a ’Comp’, pasándole dos imagenes de 4x8 elementos que difieren en uno solo de ellos(enunciado)
+PPALCOMP1: LEA(r30,0x0000F000)
+    LEA(r3,IMCOMP1);
+    PUSH(r3);
+    LEA(r3,IMCOMP2);
+    PUSH(r3);
+    bsr Comp;
+    addu r30,r30,8;
+    stop
+    ;Llama a ’Comp’, pasándole dos imágenes de 4x8 elementos en las que difieren todos sus elementos en una unidad(enunciado)
+PPALCOMP2: LEA(r30,0x0000F000)
+    LEA(r3,IMCOMP3);
+    PUSH(r3);
+    LEA(r3,IMCOMP4);
+    PUSH(r3);
+    bsr Comp;
+    addu r30,r30,8;
+    stop
+;Llama a ’ValorPixel’, pasándole una subimagen nula excepto en su elemento central y un filtro unitario. (enunciado)
+PPALVPIXEL1: LEA(r30,0x0000F000)
+             LEA(r3,MFIL4);
+             PUSH(r3);
+             LEA(r3,SUBIMG2);
+             PUSH(r3);
+             bsr ValorPixel
+             addu r30,r30,8
+             stop
+;Llama a ’ValorPixel’, pasándole una subimagen no nula y un filtro que devuelve la media de los ocho elementos que le rodean(enunciado)
+PPALVPIXEL2: LEA(r30,0x0000F000)
+             LEA(r3,MFIL)
+             PUSH(r3)
+             LEA(r3,SUBIMG3)
+             PUSH(r3)
+             bsr ValorPixel
+             addu r30,r30,8
+             stop
+
+;Pruebas funcionamiento de VPIXEL (propias)
+PPAL1: LEA(r30,0x0000F000)
+        LEA(r3,MFIL)
+        PUSH(r3)
+        LEA(r3,IMAGEN1)
+        PUSH(r3)
+        bsr ValorPixel
+        stop
+PPAL3: LEA(r30,0x0000F000)
+    LEA(r3,MFIL)
+    PUSH(r3)
+    LEA(r3,SUBIMG)
+    PUSH(r3)
+    bsr ValorPixel
+    addu r30,r30,4;
+    stop
+;Llama a ’SubMatriz’, pasándole una imagen de 3x3 elementos de la que se ha de extraer la subimagen correspondiente al elemento central
+PPALSUBMAT1: LEA(r30,0x0000F000)
+        or r3,r0,1;
+        PUSH(r3)
+        or r3,r0,1;
+        PUSH(r3)
+        LEA(r3,0x0000A000); Dirección SubImg
+        PUSH(r3)
+        LEA(r3,IMSUBMAT)
+        PUSH(r3)
+        bsr SubMatriz
+        stop
+;Llama a ’SubMatriz’, pasándole una imagen de 5x5 elementos de la que se ha de extraer
+;la subimagen correspondiente a una esquina (inferior derecha).
+PPALSUBMAT2:LEA(r30,0x0000F000)
+        or r3,r0,4;
+        PUSH(r3)
+        or r3,r0,4;
+        PUSH(r3)
+        LEA(r3,0x0000A000); Dirección SubImg
+        PUSH(r3)
+        LEA(r3,IMSUBMAT2)
+        PUSH(r3)
+        bsr SubMatriz
+        stop
+;Llama a ’FilPixel’, pasándole una imagen de 4x8 elementos y un filtro unitario que se
+;aplica al único elemento no nulo
+PPALFILPIX1:LEA(r30,0x0000F000)
+        LEA(r3,MFIL4)
+        PUSH(r3)
+        or r3,r0,r0;
+        or r3,r3,1; j = 1
+        PUSH(r3)
+        xor r3,r3,r3;
+        or r3,r3,1; i=1
+        PUSH(r3)
+        xor r3,r3,r3;
+        LEA(r3,IMFILPIX)
+        PUSH(r3)
+        xor r3,r3,r3;
+        bsr FilPixel
+        addu r30,r30,16
+        stop
+;Llama a ’FilPixel’, pasándole una imagen de 4x8 elementos y un filtro que devuelve la
+;media de los ocho elementos que le rodean
+PPALFILPIX2:LEA(r30,0x0000F000)
+        LEA(r3,MFIL)
+        PUSH(r3)
+        or r3,r0,r0;
+        or r3,r3,2; j = 2
+        PUSH(r3)
+        xor r3,r3,r3;
+        or r3,r3,2; i=2
+        PUSH(r3)
+        xor r3,r3,r3;
+        LEA(r3,IMFILPIX2)
+        PUSH(r3)
+        xor r3,r3,r3;
+        bsr FilPixel
+        addu r30,r30,16
+        stop
+;Mas pruebas para FilPixel
+PPAL4: LEA(r30,0x0000F000)
+        LEA(r3,MFIL)
+        PUSH(r3)
+        xor r3,r3,r3;
+        or r3,r3,1; j = 1
+        PUSH(r3)
+        xor r3,r3,r3;
+        or r3,r3,1; i=1
+        PUSH(r3)
+        xor r3,r3,r3;
+        LEA(r3,IMAGEN3)
+        PUSH(r3)
+        xor r3,r3,r3;
+        bsr FilPixel
+        addu r30,r30,16
+        stop
+;Llama a ’Filtro’, pasándole una imagen no nula de 4x8 elementos y un filtro que
+;devuelve la imagen duplicando el valor de los elementos.
+PPALFIL1:  LEA(r30,0x0000F000)
+  LEA(r3,MFIL5)
+  PUSH(r3)
+  LEA(r3,0x0000D000)
+  PUSH(r3)
+  LEA(r3,IMFIL);
+  PUSH(r3)
+  bsr Filtro
+  addu r30,r30,12;
+  stop
+;Llama a ’Filtro’, pasándole una imagen no nula de 4x8 elementos y un filtro que
+;multiplica por 4 cada elemento. Algunos alcanzan el valor máximo.
+PPALFIL2:  LEA(r30,0x0000F000)
+  LEA(r3,MFIL6)
+  PUSH(r3)
+  LEA(r3,0x0000D000)
+  PUSH(r3)
+  LEA(r3,IMFIL2);
+  PUSH(r3)
+  bsr Filtro
+  addu r30,r30,12;
+  stop
+;Mas pruebas para Filtro
+PPAL5:  LEA(r30,0x0000F000)
+  LEA(r3,MFIL2)
+  PUSH(r3)
+  LEA(r3,0x0000D000)
+  PUSH(r3)
+  LEA(r3,IMAGEN2) ;Probamos también con IMAGEN2
+  PUSH(r3)
+  bsr Filtro
+  addu r30,r30,12;
+  stop
+;Llama a ’FiltRec’, pasándole una imagen no nula de 4x8 elementos y un filtro que
+;sustituye cada elemento por la media de los que le rodean. El parámetro NCambios tiene valor 2.
+PPALFILREC: LEA(r30,0x0000F000);
+   or r3,r0,r0; NFILTRADOS = 0
+   PUSH(r3);
+   or r3,r0,2; NCAMBIOS
+   PUSH(r3);
+   LEA(r3,MFIL);
+   PUSH(r3);
+   LEA(r3,IMFILREC);
+   PUSH(r3);
+   bsr FiltRec;
+   addu r30,r30,16;
+   stop
+PPALFILREC2: LEA(r30,0x0000F000);
+   or r3,r0,r0;  NFILTRADOS = 0
+   PUSH(r3);
+   or r3,r0,0; NCAMBIOS
+   PUSH(r3);
+   LEA(r3,MFIL);
+   PUSH(r3);
+   LEA(r3,IMAGEN5);
+   PUSH(r3);
+   bsr FiltRec;
+   addu r30,r30,16;
+   stop
+PPAL6:   LEA(r30,0x0000F000);
+   or r3,r0,r0;
+   PUSH(r3);
+   or r3,r0,2;
+   PUSH(r3);
+   LEA(r3,MFIL);
+   PUSH(r3);
+   LEA(r3,IMAGEN4);
+   PUSH(r3);
+   bsr FiltRec;
+   addu r30,r30,16;
+   stop
+PPAL61: LEA(r30,0x0000F000)
+        or r3,r0,0;
+        PUSH(r3);
+        or r3,r0,2;
+        PUSH(r3);
+        LEA(r3,MFIL);
+        PUSH(r3)
+        LEA(r3,IMAGEN5);
+        PUSH(r3);
+        bsr FiltRec;
+        addu r30,r30,16;
+        stop
+;SUBRUTINA COMP (Imagen1, Imagen2)
+Comp:     PUSH(r1);
+        or r20,r0,r0; inicializamos r20 a ceros ACC de dif
+        ld r21,r30,4; Cargamos la dirección de la imagen 1
+        ld r22,r30,8; Cargamos la dirección de la imagen 2
+        ld r3,r21,0; Cargamos el valor M de la matriz 1
+        ld r4,r21,4; Cargamos el valor N de la matriz 1
+        mulu r5,r3,r4; Calculamos M*N
+        addu r21,r21,8; Avanzamos el puntero al inicio de los elementos de Imagen 1
+        addu r22,r22,8; Avanzamos el puntero al inicio de los elementos de Imagen 2
+REPITE: ld.bu r23, r21, 0 ; Cargamos el primer byte de la imagen 1
+       ld.bu r24, r22, 0; Cargamos el primer byte de la imagen 2
+       cmp r9,r23,r24; Comparamos el primer byte de la imagen 1 con la 2
+       bb1 gt,r9,GREAT; si el primer elemento es mayor, da un salto a la subrutina GT
+       subu r6, r24, r23 ; si no, hace una resta sin signo entre el elemento M(i,j) (matriz 2)menos el elemento M(i,j) (matriz 1)
+AVANZA: addu r20, r20, r6;
+       addu r21,r21,1; avanza puntero
+       addu r22,r22,1; avanza puntero
+       xor r6,r6,r6
+       DBNZ (r5, REPITE); retorna al bucle mediante DBNZ
+FIN:   or r29, r20, 0; la suma de las diferencias guardada en r29
+       or r20,r0,r0;
+       POP(r1); destruccion marco de pila
+       jmp (r1);
+GREAT:     subu r6,r23,r24 ; resta sin signo de las matrices
+       bsr AVANZA; retorna a AVANZA
+
+;Subrutina ValorPixel (SubImg, MFiltro)
+ValorPixel: PUSH(r1)
+    or r15,r0,r0; inicializamos Acc a ceros
+    ld r21,r30,4; Cargamos la dirección de SubImg
+    ld r22,r30,8; Cargamos la dirección de Mfiltro
+    ld r5,r22,0; en r5 cargamos K
+    ld r6, r22,4; en r6 cargamos C
+    ld r7, r22,8; en r7 cargamos B
+    or r14, r0,4; r14<-4
+BUCLE1: ld.bu r11,r21,0; dirección del comienzo de la submatriz
+    mulu r8,r11,r7; byte*B
+    addu r15,r15,r8; añadimos a acc
+    or r8,r0,r0; limpiamos r8
+    addu r21,r21,1; avanzamos elem sig
+    DBNZ(r14,BUCLE1); repetimos el bucle para los 4 elementos
+;Elemento central:
+    ld.bu r11,r21,0; byte del centro
+    mulu r8,r11,r6; byte del centro * C
+    addu r15,r15,r8; añadimos a acc
+    addu r21,r21,1; avanzamos elem sig
+    or r14,r0,4;
+BUCLE2: ld.bu r11,r21,0;
+    mulu r8,r11,r7;
+    addu r15,r15,r8;
+    or r8,r0,r0;
+    addu r21,r21,1;
+    DBNZ(r14,BUCLE2); repetimos bucle anterior para los 4 elementos siguientes (igual que B1)
+    divu r15,r15,r5; ACC/K
+    or r18,r0,255;
+    xor r19,r19,r19;
+    cmp r19,r15,r18;
+    bb1 gt,r19,RESETMAYOR; si positivo, salta a MAYOR
+    cmp r19,r15,r0;
+    bb1 lt,r19,RESETMENOR; si negativo, salta a MENOR
+FINVPIX:or r29,r15,r0;
+    POP(r1);
+    jmp(r1); destruccion marco de pila
+RESETMAYOR: or r15,r0,255; como es positivo restauramos a 255
+        bsr FINVPIX; retorna a FIN
+RESETMENOR: or r15,r0,r0; como es negativo restauramos a 0
+        bsr FINVPIX; retorna a FIN
+
+;Subrutina SubMatriz(Imagen, SubImg, i, j )
+SubMatriz: PUSH(r1);
+            ld r20,r30,4; cargamos la imagen
+            ld r21,r30,8; cargamos subImagen
+            ld r22,r30,12; cargamos i (por valor)
+            ld r23,r30,16; cargamos j (por valor)
+            ld r3,r20,0; cargamos M en r3
+            ld r4,r20,4; cargamos N en r4
+            subu r5,r3,1;  M-1 en r5
+            subu r6,r4,1;  N-1 en r6
+            cmp r7,r22,r0;
+            bb1 eq,r7,ESBORDE; compara i con 0
+            cmp r7,r22,r5
+            bb1 eq,r7,ESBORDE; compara i con m-1
+            cmp r7,r23,r0;
+            bb1 eq,r7,ESBORDE; compara j con 0
+            cmp r7,r23,r6; 
+            bb1 eq,r7,ESBORDE; compara j con n-1
+            addu r20,r20,8; Inicio elementos Imagen
+            mulu r8,r22,r4; I*N
+            addu r8,r8,r23; I*N+J
+            addu r20,r20,r8; I(i,j)
+            or r12,r20,r20; Copiamos el valor del puntero
+            addu r9,r4,1;
+            subu r20,r20,r9; I(i-1,j-1)
+            or r29,r0,3;  3 en r29
+    I1:     ld.bu r25,r20,0; Para la fila 1
+            st.b r25,r21,0;
+            addu r20,r20,1; desplaza el puntero de I(i,j) a I(i-1,j-1)
+            addu r21,r21,1;
+            DBNZ(r29,I1); mediante el bucle DBNZ, hace 3 iteraciones
+            or r20,r12,r12; I(i,j)
+            subu r20,r20,1; 
+            or r29,r0,3;
+    I2:     ld.bu r25,r20,0; para la fila 2
+            st.b r25,r21,0;
+            addu r20,r20,1; desplaza el puntero uno a la izquierda
+            addu r21,r21,1;
+            DBNZ(r29,I2) 
+            or r20,r12,r12
+            addu r20,r20,r6;
+            or r29,r0,3;
+     I3:    ld.bu r25,r20,0; para la fila 3
+            st.b r25,r21,0;
+            addu r20,r20,1;desplaza puntero hasta I(i+1,j-1)
+            addu r21,r21,1;
+            DBNZ(r29,I3)
+            POP(r1); destruccion pila
+            jmp(r1);
+   ESBORDE: or r8,r0,9; busqueda del elemento otra vez
+            mulu r13,r22,r4
+            addu r13,r13,r23;
+            addu r20,r20,8;
+            addu r20,r20,r13; I(i,j)
+            ld.bu r20,r20,0;
+ BUCLEESBORD:   st.b r20,r21,0; Carga el elemento
+            addu r21,r21,1;
+            DBNZ(r8,BUCLEESBORD); y lo copia 9 veces en las posiciones de la SubImagen (con la macro DBNZ)
+            POP(r1)
+            jmp(r1); esta vez en vez de llamar a una etiqueta fin hemos destruido el marco de pila desde donde es posible acabar la subrutina
+
+
+;Subrutina FilPixel ( Imagen, i, j, MFiltro )
+FilPixel:   PUSH(r1);
+            PUSH(r31);
+            or r31,r30,0; Creamos marco de pila
+            ld r20,r30,8; IM
+            ld r21,r30,12;i
+            ld r22,r30,16;j
+            subu r30,r30,12; espacio para variables locales
+            or r4,r30,r0;
+            PUSH(r22); j
+            PUSH(r21); i
+            PUSH(r4); subImagen
+            PUSH(r20); Imagen
+            bsr SubMatriz; LLama a SubMatriz
+            addu r30,r30,16; vaciamos pila
+            ld r23,r31,20; Mfiltro
+            or r4,r30,0;dir Subimagen
+            PUSH(r23);
+            PUSH(r4);metemos ambos en pila
+            bsr ValorPixel; Llama a ValorPixel
+            addu r30,r30,8; vaciamos pila
+            or r30, r31,0;
+            POP(r31);
+            POP(r1);
+            jmp(r1); destruido marco de pila
+;Subrutina Filtro (Imagen, ImFiltrada, Mfiltro)
+Filtro: PUSH(r1)
+        PUSH(r31)
+        or r31,r30,0;
+        ld r20,r30,8; IMAGEN
+        ld r26,r30,12; ImFILTRADA
+        ld r22,r30,16; MFILTRO
+        ld r3,r20,0; M
+        ld r4,r20,4; N
+        st r4,r26,4; ImFIL<-N
+        st r3,r26,0; ImFIL<-M
+        addu r26,r26,8; INICIO ELEMENTOS IMAGEN
+        subu r5,r3,1;M-1
+        subu r6,r4,1;N-1
+        or r10,r0,0; i=0
+        or r16,r0,0; j=0
+ BUCLEFILTRO:  cmp r7,r10,r5; i>M-1? SI -> FIN
+           bb1 gt,r7,FINFILTRO;
+           PUSH(r22); Mfiltro
+           PUSH(r16); j
+           PUSH(r10); i
+           PUSH(r20); Imagen
+           bsr FilPixel; En r29 tendremos pixel filtrado
+           addu r30,r30,16; Limpiamos pila
+           st.b r29,r26,0; Guardamos valor en ImFiltrada
+           addu r26,r26,1; Incrementamos al elemento siguiente
+           addu r16,r16,1; Incrementamos J
+           ld r22,r30,16;  Restauramos MFILTRO
+           ld r20,r30,8;   Restauramos IMAGEN
+           ld r3,r20,0; M
+           ld r4,r20,4; N
+           subu r5,r3,1;M-1
+           subu r6,r4,1;N-1
+           cmp r7,r16,r6;  j>N-1? SI-> Sig Fila
+           bb1 gt,r7,INCREMENTO;
+           bsr BUCLEFILTRO;     Si no, vuelve al bucle.
+FINFILTRO: or r30,r31,0;     Destrucción Pila
+           POP(r31);
+           POP(r1);
+           jmp(r1);
+ INCREMENTO:  addu r10,r10,1;  Incrementamos la fila
+           or r16,r0,0;      Limpiamos j
+           bsr BUCLEFILTRO;
+
+;Subrutina FiltRec (Imagen, Mfiltro, NCambios, NFiltrados)
+FiltRec:  PUSH(r1);
+          PUSH(r31);
+          or r31,r30,0;
+          ld r20,r30,8; Imagen
+          ld r21,r30,12; MFILTRO
+          ld r22,r30,16; MCambios
+          ld r23,r30,20; NFiltrados
+          ld r3,r20,0; M
+          ld r4,r20,4; N
+          mulu r8,r3,r4; M*N
+          mak r8,r8,0<1>; Ajustamos al múltiplo de 4 más cercano
+          addu r8,r8,8; Calculamos el espacio total que necesitamos guardar
+          subu r30,r30,r8;
+          or r24,r30,0; Dirección de inicio de ImFiltro
+          PUSH(r21)
+          PUSH(r24)
+          PUSH(r20)
+          bsr Filtro
+          addu r30,r30,12; Limpiamos pila
+          or r24,r30,0; Puntero ImFiltro
+          ld r20,r31,8; Imagen
+          ld r21,r31,12; MFILTRO
+          ld r22,r31,16; MCambios
+          ld r23,r31,20; NFiltrados
+          addu r17,r17,1; Incrementamos nFiltrados
+          st r17,r23,0;
+          xor r8,r8,r8;
+          or r8,r0,15; Comparamos el valor de NFiltrados con 15
+          cmp r9,r17,r8
+          bb1 ge,r9,STOP
+          PUSH(r24)
+          PUSH(r20)
+          bsr Comp; Tendremos en r29 el valor de diferencia entre las dos matrices
+          addu r30,r30,8;
+          or r24,r30,0; Puntero ImFiltro
+          ld r20,r31,8; Imagen
+          ld r21,r31,12; MFILTRO
+          ld r22,r31,16; MCambios
+          ld r23,r31,20; NFiltrados
+          cmp r9,r29,r22
+          bb1 lt,r9,STOP; Si Comp >  NCambios, seguimos, si no, BUCFINAL
+          PUSH(r23); Nfiltrados
+          PUSH(r22); Ncambios
+          PUSH(r21); Mfiltro
+          PUSH(r24); ImFiltrada
+          bsr FiltRec;
+          addu r30,r30,16;
+STOP:     or r29,r17,0;
+		  or r24,r30,0; restauramos el puntero 
+          ld r20,r31,8;
+          ld r3,r20,0;
+          ld r4,r20,4;
+          mulu r3,r3,r4; r3=M*N
+          addu r20,r20,8; Inicio de elementos de la matriz
+          addu r24,r24,8; Inicio elementos de imagen filtrada
+SOBREESC:   ld.bu r25,r24,0; Cargamos elemento de la imagen filtrada en r25
+            st.b r25,r20,0;  y se guarda en la direccion de la imagen
+            addu r24,r24,1; avanzamos punteros
+            addu r20,r20,1;
+            DBNZ(r3,SOBREESC); bucle
+            or r30,r31,0;
+            POP(r31)
+            POP(r1)
+            jmp(r1);destruccion marco de pila
+			
+			
+	
+;Ejemplos: Programas de prueba dados por el enunciado, mas algunos otros usados para comprobar mas casos
+IMAGEN1:data 0x01020304, 0x05060708, 0x00000009
+IMAGEN2:data 3,3
+    data 0x02030405, 0x06070809, 0x0000000A
+IMAGEN3:data 4,8
+     data 0xFF00FF00, 0x00FF00FF, 0xFF00FF00, 0x00FF00FF, 0xFF00FF00, 0x00FF00FF,0xFF00FF00, 0x00FF00FF
+IMAGEN4: data 2,3
+      data 0x0304020A, 0x00000102
+IMAGEN5: data 4,8
+     data 0xFF0000FF, 0xFF0000FF, 0xFF0000FF, 0xFF0000FF, 0xFF0000FF, 0xFF0000FF, 0xFF0000FF, 0xFF0000FF
+IMCOMP1: data 4,8
+      data 0x00000000, 0x00000000, 0x00000000, 0x00000700, 0x00000000, 0x00000000, 0x00000000, 0x00000000
+IMCOMP2: data 4,8
+      data 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000
+IMCOMP3: data 4,8
+     data 0xFF55FF55, 0xFF55FF55, 0x55FF55FF, 0x55FF55FF, 0xFF55FF55, 0xFF55FF55, 0x55FF55FF, 0x55FF55FF
+IMCOMP4: data 4,8
+     data 0xFE54FE54, 0xFE54FE54, 0x54FE54FE, 0x54FE54FE, 0xFE54FE54,  0xFE54FE54,  0x54FE54FE, 0x54FE54FE
+IMSUBMAT: data 3,3
+     data 0x40302010, 0x80706050, 0x00000090
+IMSUBMAT2: data 5,5
+     data 0x04030201, 0x08070605, 0x0C0B0A09, 0x100F0E0D, 0x14131211, 0x18171615, 0x00000019
+IMFILPIX: data 4,8
+     data 0x00000000, 0x00000000, 0x00003300, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000
+IMFILPIX2: data 4,8
+     data 0x44444444, 0x44444444, 0x33343544, 0x44444444, 0x44884444, 0x44444444, 0x44444444, 0x44444444
+IMFIL: data 4,8
+     data 0x12345678, 0x11223344, 0x12345678, 0x12233445, 0x12345678, 0x11223344, 0x12345678, 0x12233445
+IMFIL2: data 4,8
+      data 0x04030201, 0x07060504, 0x14134211, 0x17168514, 0x24232221, 0x27262574, 0x34333231, 0x37363534
+IMFILREC: data 4,8
+      data 0xFF00FF00, 0x00FF00FF, 0xFF00FF00, 0x00FF00FF, 0xFF00FF00, 0x00FF00FF,0xFF00FF00, 0x00FF00FF
+;MFIL
+MFIL:  data 8,0,1;
+MFIL2: data 3,4,2;
+MFIL3: data 1,2,1;
+MFIL4: data 1,1,0;
+MFIL5: data 1,2,0;
+MFIL6: data 1,4,0;
+;SUBIMG
+SUBIMG: data 0x0000FF00, 0xFF0000FF, 0x00000000
+SUBIMG2: data 0x00000000, 0x00000055, 0x00000000
+SUBIMG3: data 0x13121110, 0x17161514, 0x00000018

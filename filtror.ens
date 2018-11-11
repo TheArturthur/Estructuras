@@ -47,10 +47,10 @@ Imagen2_data: data 3, 3
 
 Mfiltro_data:
   data	0x01010101
-  data	0x01010100
+  data	0x01010101
   data	0x00000001
 
-Modfiltro_data: data 0, 0 		; Dupla
+Modfiltro_data: data 2, 1 		; Dupla
 
 ;Pruebas SubMatriz:
 
@@ -242,26 +242,24 @@ FIN_cmp:
 
 ActualizaFiltro:						; ActualizaFiltro (MFiltro, ModFiltro)
 	PUSH	(r1)
-	ld		r2, r30, 4					; ModFiltro
-	ld		r4, r30, 8					; MFiltro
-	ld		r6, r2, 0						; r6 <- numerador
-	ld		r8, r2, 4						; r8 <- denominador
+	ld		r2, r30, 8					; MFiltro
+	ld		r4, r30, 4					; ModFiltro
+	ld		r6, r4, 0						; r6 <- numerador
+	ld		r8, r4, 4						; r8 <- denominador
 	muls	r10, r6, r8					; r10 = numerador * denominador
 	cmp		r3, r10, r0
 	;Si numerador * denominador = 0, uno de los dos (o ambos) es nulo:
 	bb1		eq, r3, FIN_ACTF
 	;Si no es cero, ninguno es nulo:
-	addu	r9, r0, r0					; Contador
-	or		r11, r4, r0					; Puntero
+	addu	r11, r0, r0					; Contador
 
 BUC_ACTF:
-	ld		r12, r11, 0					; r12 <- dato Matriz
+	ld.b	r12, r2, r11				; r12 <- dato Matriz
 	muls	r13, r12, r6				; r13 <- dato * numerador
 	divs	r14, r13, r8				; r14 <- dato * numerador / denominador
-	st		r14, r11, 0					; r14 <- puntero (devuelve dato)
-	addu	r9, r9, 1						; contador = contador + 1
-	addu	r11, r11, 4					; actualiza puntero
-	cmp		r5, r9, 8
+	st.b	r14, r2, r11				; r14 <- puntero (devuelve dato)
+	addu	r11, r11, 1					; contador = contador + 1
+	cmp		r5, r11, 8
 	; Si faltan datos en la matriz por actualizar, repite con el siguiente:
 	bb1		le, r5, BUC_ACTF
 	; Si no faltan datos, termina:

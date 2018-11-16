@@ -66,6 +66,15 @@ SubImg_data: ;data  3
   data	1, 1, 1
 
 SubImg_res: res 12						; Reserva de espacio para almacenar SubImg
+
+org 0x2000
+IMAGEN:
+	data 3, 3
+	data 0x40302010, 0x80706050, 0x90
+
+org 0x2040
+SUBIMAGEN:
+	data 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF
 ;Pruebas ValorPixel:
 
 ;Pruebas Filtro:
@@ -81,14 +90,14 @@ PPAL:
 
 PPALSubMatriz:
   LEA		(r30,60000)						; Inicializacion del puntero de pila
-  or 		r2, r0, 2
-  PUSH	(r2)									; j=2
-  or 		r2,r0,1
-  PUSH	(r2) 									; i=1
-  LEA		(r2,SubImg_res)
-  PUSH	(r2)
-  LEA		(r2,Imagen1_data) 		; carga Matriz imagen
-  PUSH	(r2)
+	LEA		(r2,IMAGEN)				 		; carga Matriz imagen
+	PUSH	(r2)
+	LEA		(r2,SUBIMAGEN)				; carga direccion de SubImg
+	PUSH	(r2)
+	or 		r2, r0, 1
+	PUSH	(r2) 									; i=1
+  or 		r2, r0, 1
+	PUSH	(r2)									; j=1
   bsr 	SubMatriz
   stop
 
@@ -266,50 +275,57 @@ FiltRec:
 SubMatriz: 									; SubMatriz (Img, SubImg, i, j)
 	PUSH	(r1)
 	;Carga de datos en registros:
-	ld		r2, r30, 12					; r2 <- i
-	ld		r4, r30, 16					; r4 <- j
-	ld		r6, r30, 4					; r6 <- Img (dir)
-	ld		r8, r30, 8					; r8 <- SubImg (dir)
-	ld		r10, r8, r0					; r10 <- M
-	ld		r11, r8, 4					; r11 <- N
-	mulu	r15, r2, r11				; r15 <- i * N
-	addu	r15, r15, r4				; r15 <- i * N + j
-	mulu	r16, r10, r11				; r16 <- M * N (contador para elementos de SubImg que quedan por copiar)
-	addu	r17, r6, 8					; Primer elemento de Imagen
-	addu	r18, r17, r15				; Elemento central (Img[i,j])
-	;Operaciones para comprobaciones de i y de j:
-	mulu	r12, r2, r4					; r12 <- i*j
-	subu	r13, r10, 1					; r13 <- M-1
-	subu	r14, r11, 1					; r14 <- N-1
-	cmp		r3, r12, 0
+	ld		r2, r30, 4					; j
+	ld		r4, r30, 8					; i
+	ld		r6, r30, 12					; dir SubImg
+	ld		r8, r30, 16					; dir Img
+	ld		r9, r8, 0						; M
+	ld		r10, r8, 4					; N
+	mulu	r11, r4, r10				; i*N
+	addu	r12, r8, 8				; puntero primer dato Img
+	or		r21, r12, r0				; puntero para recorrer datos (inicializado en primer dato Img)
+	addu	r13, r12, r11				; fila i
+	addu	r13, r13, r2				; dir dato central
+	ld.b	r14, r13, 0					; valor dato central
+	mulu	r15, r2, r4					; i*j
+	subu	r16, r9, 1					; M-1
+	subu	r17, r10, 1					; N-1
+	addu	r22, r0, 9					; Contador para los 9 elementos
+	cmp		r3, r15, 0
 	;Si i*j=0 => i=0 y/o j=0 => elemento en borde
 	bb1		eq, r3, SM_EXTR
 	;Si no, puede seguir en borde si i=M-1 y/o j=N-1:
-	cmp		r5, r13, r2
+	cmp		r5, r16, r4
 	;Si i=M-1 => elemento en borde:
 	bb1		eq, r5, SM_EXTR
 	;Si no, comprobamos j=N-1:
-	cmp		r7, r14, r4
+	cmp		r7, r17, r2
 	;Si j=N-1 => elemento en borde:
 	bb1		eq, r7, SM_EXTR
 
 SM_N_EXTR:
-	subu	r19, r2, 1					; r19 <- i-1
-	subu	r20, r4, 1					; r20 <- j-1
-	mulu	r21, r19, r11				; r21 <- (i-1) * N
-	addu	r21, r19, r20				; r21 <- (i-1) * N + (j-1)
-	addu	r22, r17, r21				; r22 <- dir primer elemento a copiar (Img[i-1,j-1])
-	ld.b	r23, r22, 0					; r23 <- elemento a copiar
-	st.b	r23, r8, 0					; r23 -> M(r8+0)
-	addu	r8, r8, 1						; Actualizo el puntero de SubImg
-	addu	r22, r22, 1					; Actualizo el puntero de Img
-	DBNZ	(r16, SM_N_EXTR)		; Usamos DBNZ para iterar por los 9 elementos
-	br		FIN_SM
+	addu	r18, r0, 3					; fila
+BUC_FIL_SM:
+	addu	r19, r0, 3					; col
+	subu	r18, r18, 1
+	cmp		r3, r18, r0
+	bb1		lt, r3, FIN_SM
+BUC_COL_SM:
+	ld.b	r20, r12, 0					; dato
+	st.b	r20, r6, 0					; dato -> M(r6) (puntero en SubImg)
+	addu	r12, r12, 1					; actualizo puntero en Img
+	addu	r6, r6, 1						; actualizo puntero en SubImg
+	subu	r19, r19, 1
+	cmp		r5, r19, r0
+	bb1		gt, r5, BUC_COL_SM
+	;Cambio de fila:
+	addu	r21, r17, 0					; puntero a primer elemento de siguiente fila
+	br		BUC_FIL_SM
 
 SM_EXTR:										; Bucle para copiar elemento en SubImg (dato en borde)
-	st.b	r18, r8, 0					; Copiamos el elemento central en el primer hueco de SubImg
-	addu	r8, r8, 1						; Actualizamos el puntero al siguiente elemento
-	DBNZ	(r16, SM_EXTR)			; Usamos DBNZ para iterar por los nueve elementos de SubImg
+	st.b	r14, r6, 0					; Copiamos el elemento central en el primer hueco de SubImg
+	addu	r6, r6, 1						; Actualizamos el puntero al siguiente elemento
+	DBNZ	(r22, SM_EXTR)			; Usamos DBNZ para iterar por los nueve elementos de SubImg
 	br		FIN_SM
 
 FIN_SM:

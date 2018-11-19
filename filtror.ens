@@ -46,11 +46,11 @@ Imagen2_data: data 3, 3
 ;Pruebas ActualizaFiltro:
 
 Mfiltro_data:
-  data	0x01010101
-  data	0x01010101
-  data	0x00000001
+  data	1, 2, 3
+  data	4, 5, 6
+  data	7, 8, 9
 
-Modfiltro_data: data 2, 1 		; Dupla
+Modfiltro_data: data 0, 0 		; Dupla
 
 ;Pruebas SubMatriz:
 
@@ -242,8 +242,8 @@ FIN_cmp:
 
 ActualizaFiltro:						; ActualizaFiltro (MFiltro, ModFiltro)
 	PUSH	(r1)
-	ld		r2, r30, 8					; MFiltro
-	ld		r4, r30, 4					; ModFiltro
+	ld		r2, r30, 4					; MFiltro
+	ld		r4, r30, 8					; ModFiltro
 	ld		r6, r4, 0						; r6 <- numerador
 	ld		r8, r4, 4						; r8 <- denominador
 	muls	r10, r6, r8					; r10 = numerador * denominador
@@ -275,10 +275,10 @@ FiltRec:
 SubMatriz: 									; SubMatriz (Img, SubImg, i, j)
 	PUSH	(r1)
 	;Carga de datos en registros:
-	ld		r2, r30, 4					; j
-	ld		r4, r30, 8					; i
-	ld		r6, r30, 12					; dir SubImg
-	ld		r8, r30, 16					; dir Img
+	ld		r2, r30, 16					; j
+	ld		r4, r30, 12					; i
+	ld		r6, r30, 8					; dir SubImg
+	ld		r8, r30, 4					; dir Img
 	ld		r9, r8, 0						; M
 	ld		r10, r8, 4					; N
 	mulu	r11, r4, r10				; i*N
@@ -336,8 +336,8 @@ ValorPixel:									; ValorPixel (SubImg, MFiltro)
 	PUSH	(r1)
 	or		r2, r0, r0					; r2 <- ACC = 0
 	or		r29, r0, r0					; r29 <- res = 0
-	ld		r4, r30, 4					; r4 <- dir SubImg
-	ld		r6, r30, 8					; r6 <- dir MFiltro
+	ld		r4, r30, 8					; r4 <- dir SubImg
+	ld		r6, r30, 4					; r6 <- dir MFiltro
 	addu	r8, r0, 8						; r8 <- Contador de elementos por filtrar
 
 BUC_VPixel:

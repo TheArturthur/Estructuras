@@ -13,9 +13,9 @@ POP: MACRO (reg)
 	addu r30, r30, 4
 ENDMACRO
 DBNZ: MACRO	(reg, ETIQ)
-  sub    reg, reg, 1
-  cmp    r3, reg, r0
-  bb1    ne, r3, ETIQ
+  	sub    reg, reg, 1
+	cmp    r3, reg, r0
+	bb1    ne, r3, ETIQ
 ENDMACRO
 LEA: MACRO	(reg, ETIQ)
 	or reg, r0, low(ETIQ)
@@ -46,9 +46,9 @@ Imagen2_data: data 3, 3
 ;Pruebas ActualizaFiltro:
 
 Mfiltro_data:
-  data	1, 2, 3
-  data	4, 5, 6
-  data	7, 8, 9
+  data	1, 1, 1
+  data	1, 0, 1
+  data	1, 1, 1
 
 Modfiltro_data: data 0, 0 		; Dupla
 
@@ -70,7 +70,7 @@ SubImg_res: res 12						; Reserva de espacio para almacenar SubImg
 org 0x2000
 IMAGEN:
 	data 3, 3
-	data 0x40302010, 0x80706050, 0x90
+	data 0x04030201, 0x08070605, 0x09
 
 org 0x2040
 SUBIMAGEN:
@@ -80,6 +80,18 @@ SUBIMAGEN:
 ;Pruebas Filtro:
 
 ;Pruebas FilPixel:
+PPALFilPixel:
+	LEA		(r30, 60000)
+	LEA		(r2, Mfiltro_data)
+	or		r4, r0, 1					; j=1
+	or		r6, r0, 1					; i=1
+	LEA		(r8, IMAGEN)
+	PUSH	(r2)
+	PUSH	(r4)
+	PUSH	(r6)
+	PUSH	(r8)
+	bsr		FilPixel
+	stop
 
 ;Pruebas FiltRec:
 
@@ -89,28 +101,28 @@ PPAL:
 	jmp		(r1)
 
 PPALSubMatriz:
-  LEA		(r30,60000)						; Inicializacion del puntero de pila
-	LEA		(r2,IMAGEN)				 		; carga Matriz imagen
+  	LEA		(r30,60000)					; Inicializacion del puntero de pila
+	LEA		(r2,IMAGEN)			 		; carga Matriz imagen
 	PUSH	(r2)
 	LEA		(r2,SUBIMAGEN)				; carga direccion de SubImg
 	PUSH	(r2)
 	or 		r2, r0, 1
-	PUSH	(r2) 									; i=1
-  or 		r2, r0, 1
-	PUSH	(r2)									; j=1
-  bsr 	SubMatriz
-  stop
+	PUSH	(r2) 						; i=1
+  	or 		r2, r0, 1
+	PUSH	(r2)						; j=1
+  	bsr 	SubMatriz
+  	stop
 
 PPALnFiltrados:
-	LEA		(r30, 60000)					; inicializacion del puntero de pila
-  ; or 		r5, r0, 3						; cargas un valor oper
-  ; PUSH	(r5)								; lo metes en la pila
+	LEA		(r30, 60000)				; inicializacion del puntero de pila
+  ; or 		r5, r0, 3					; cargas un valor oper
+  ; PUSH	(r5)						; lo metes en la pila
   ; bsr 	nFiltrados 					; y llamas a nFiltrados
   ; sub 	r5, r0, 6
-	; PUSH	(r5)
-	; bsr		nFiltrados
+  ;	PUSH	(r5)
+  ; bsr		nFiltrados
   ; or 		r5, r0, -4  				; cargas un valor oper
-  ; PUSH	(r5)  							; lo metes en la pila
+  ; PUSH	(r5)  						; lo metes en la pila
   ; bsr 	nFiltrados
   ; or 		r5, r0, 1
   ; PUSH	(r5)
@@ -123,22 +135,22 @@ PPALnFiltrados:
 	add		r5, r0, -5
 	PUSH	(r5)
 	bsr		nFiltrados
-  or 		r5, r0, 3							; cargas un valor oper
-  PUSH	(r5)									; lo metes en la pila
-  bsr 	nFiltrados 						; y llamas a nFiltrados
-  sub 	r5, r0,6
-  ;or r5,r0,-4 		 						; cargas un valor oper
-  PUSH	(r5)  								; lo metes en la pila
-  bsr 	nFiltrados						; y llamas a nFiltrados
-  or 		r5, r0, 1							; .....
-  PUSH	(r5)
-  bsr 	nFiltrados
-  sub 	r5,r0,2
-  PUSH	(r5)
-  bsr 	nFiltrados
-  PUSH	(r5)
-  bsr 	nFiltrados
-  stop
+  	or 		r5, r0, 3					; cargas un valor oper
+ 	PUSH	(r5)						; lo metes en la pila
+  	bsr 	nFiltrados 					; y llamas a nFiltrados
+  	sub 	r5, r0,6
+  	;or r5,r0,-4 		 				; cargas un valor oper
+  	PUSH	(r5)  						; lo metes en la pila
+  	bsr 	nFiltrados					; y llamas a nFiltrados
+  	or 	r5, r0, 1						; .....
+  	PUSH	(r5)
+  	bsr 	nFiltrados
+  	sub 	r5,r0,2
+  	PUSH	(r5)
+  	bsr 	nFiltrados
+  	PUSH	(r5)
+  	bsr 	nFiltrados
+  	stop
 
 PPALComp:
 	LEA		(r30, 60000)
@@ -151,17 +163,17 @@ PPALComp:
 
 PPALActFiltro:
 	LEA		(r30, 60000)				; Inicializa puntero de pila en dir 0x60000
-	LEA		(r2, Mfiltro_data)	; Cargo Mfiltro_data en r2
-	PUSH	(r2)								; Y lo meto en la pila
-	LEA		(r2, Modfiltro_data)	; Cargo Modfiltro_data en r2
-	PUSH	(r2)								; Y lo meto en la pila
+	LEA		(r2, Mfiltro_data)			; Cargo Mfiltro_data en r2
+	PUSH	(r2)						; Y lo meto en la pila
+	LEA		(r2, Modfiltro_data)		; Cargo Modfiltro_data en r2
+	PUSH	(r2)						; Y lo meto en la pila
 	bsr		ActualizaFiltro
 	stop
 
 PPALVPixel:
-  LEA		(r30, 60000) 				; Inicializacion del puntero de pila
-  LEA		(r10, SubImg_data)	; carga de los datos
-  LEA		(r11, Mfiltro_data)	; de pruebas
+  LEA	(r30, 60000) 					; Inicializacion del puntero de pila
+  LEA	(r10, SubImg_data)				; carga de los datos
+  LEA	(r11, Mfiltro_data)				; de pruebas
   PUSH	(r10)
   PUSH	(r11)
   bsr 	ValorPixel
@@ -171,7 +183,7 @@ PPALVPixel:
 ; ---------------------------------------------> Subrutinas:
 ;
 org  3000
-nFiltrados:									; nFiltrados (oper)
+nFiltrados:								; nFiltrados (oper)
 	PUSH	(r1)
 	addu	r29, r0, r0					; r29 = 0 (inicializar)
 	ld		r2, r0, r0					; r2 <- nF (nF esta en la dir 0)
@@ -182,42 +194,42 @@ nFiltrados:									; nFiltrados (oper)
 	bb1		ge, r5, OPER_POS
 
 	;Si oper < 0:
-	subu	r2, r2, 1						; r2 <- r2 - 1
+	subu	r2, r2, 1					; r2 <- r2 - 1
 	st		r2, r0, r0					; r2 -> M(0x0000), nF--
 	addu	r6, r2, r0					; r6 <- r2
 	cmp		r3, r2, r0
 
 	;Si nF < 0:
 	bb1		lt, r3, NF_NEG
-	br		FIN_nF
+	br		NF_FIN
 
 OPER_POS:
 	st		r4, r0, r0					; r4 -> M(0x0000) <=> nF = oper
 	addu	r6, r4, r0					; r6 <- oper
-	br		FIN_nF
+	br		NF_FIN
 
 NF_NEG:
 	st		r0, r0, r0					; r0 -> M(0x0000) <=> nF = 0
 	addu	r6, r0, r0					; r6 <- 0
-	br		FIN_nF
+	br		NF_FIN
 
-FIN_nF:
+NF_FIN:
 	or 		r29, r6, r0					; r29 <- r6 (res)
 	POP		(r1)
 	jmp		(r1)
 
-Comp:												; Comp (Img1, Img2)
+Comp:									; Comp (Img1, Img2)
 	PUSH	(r1)
 	or		r2, r0, r0 					; Dif = 0
 	or		r29, r0, r0					; r29 = 0
 	ld		r4, r30, 4					; dir Im1
 	ld		r6, r30, 8					; dir Im2
 	ld		r11, r4, 0					; r11 <- M1
-	ld		r8, r4, 4						; r8 <- N1
+	ld		r8, r4, 4					; r8 <- N1
 	ld		r12, r6, 0					; r12 <- M2
 	ld		r10, r6, 4					; r10 <- N2
-	addu	r4, r4, 8						;	r4 <- dir primer elemento Im1
-	addu	r6, r6, 8						;	r6 <- dir primer elemento Im2
+	addu	r4, r4, 8					;	r4 <- dir primer elemento Im1
+	addu	r6, r6, 8					;	r6 <- dir primer elemento Im2
 	addu	r16, r0, r0					; Contador con elementos comparados
 
 COMPARA:
@@ -226,13 +238,13 @@ COMPARA:
 	sub		r13, r12, r11
 	muls	r13, r13, r13
 	add		r2, r2, r13					; Dif = Dif + (Dato_Im1-Dato_Im2)^2
-	addu	r4, r4, 1						; r4 <- r4 + 1 (Actualiza puntero)
-	addu	r5, r5, 1						; r5 <- r5 + 1 (Actualiza puntero)
+	addu	r4, r4, 1					; r4 <- r4 + 1 (Actualiza puntero)
+	addu	r5, r5, 1					; r5 <- r5 + 1 (Actualiza puntero)
 	addu	r16, r16, 1					; Act. contador elementos comparados
 	cmp		r3, r16, r8
-	bb1		lt, r3, COMPARA			; Si quedan elementos por comparar, repite
+	bb1		lt, r3, COMPARA				; Si quedan elementos por comparar, repite
 
-FIN_cmp:
+CMP_FIN:
 	divu	r2, r2, r8					; Dif = Dif / M*N
 	or		r29, r2, r0					; r29 <- Dif
 	or		r2, r0, r0					; r2 <- 0
@@ -244,12 +256,12 @@ ActualizaFiltro:						; ActualizaFiltro (MFiltro, ModFiltro)
 	PUSH	(r1)
 	ld		r2, r30, 4					; MFiltro
 	ld		r4, r30, 8					; ModFiltro
-	ld		r6, r4, 0						; r6 <- numerador
-	ld		r8, r4, 4						; r8 <- denominador
+	ld		r6, r4, 0					; r6 <- numerador
+	ld		r8, r4, 4					; r8 <- denominador
 	muls	r10, r6, r8					; r10 = numerador * denominador
 	cmp		r3, r10, r0
 	;Si numerador * denominador = 0, uno de los dos (o ambos) es nulo:
-	bb1		eq, r3, FIN_ACTF
+	bb1		eq, r3, ACTF_FIN
 	;Si no es cero, ninguno es nulo:
 	addu	r11, r0, r0					; Contador
 
@@ -264,25 +276,22 @@ BUC_ACTF:
 	bb1		le, r5, BUC_ACTF
 	; Si no faltan datos, termina:
 
-FIN_ACTF:
+ACTF_FIN:
 	POP		(r1)
 	jmp		(r1)
 
 
-FiltRec:
-	jmp		(r1)
-
-SubMatriz: 									; SubMatriz (Img, SubImg, i, j)
+SubMatriz: 								; SubMatriz (Img, SubImg, i, j)
 	PUSH	(r1)
 	;Carga de datos en registros:
 	ld		r2, r30, 16					; j
 	ld		r4, r30, 12					; i
 	ld		r6, r30, 8					; dir SubImg
 	ld		r8, r30, 4					; dir Img
-	ld		r9, r8, 0						; M
+	ld		r9, r8, 0					; M
 	ld		r10, r8, 4					; N
 	mulu	r11, r4, r10				; i*N
-	addu	r12, r8, 8				; puntero primer dato Img
+	addu	r12, r8, 8					; puntero primer dato Img
 	or		r21, r12, r0				; puntero para recorrer datos (inicializado en primer dato Img)
 	addu	r13, r12, r11				; fila i
 	addu	r13, r13, r2				; dir dato central
@@ -309,12 +318,12 @@ BUC_FIL_SM:
 	addu	r19, r0, 3					; col
 	subu	r18, r18, 1
 	cmp		r3, r18, r0
-	bb1		lt, r3, FIN_SM
+	bb1		lt, r3, SM_FIN
 BUC_COL_SM:
 	ld.b	r20, r12, 0					; dato
 	st.b	r20, r6, 0					; dato -> M(r6) (puntero en SubImg)
 	addu	r12, r12, 1					; actualizo puntero en Img
-	addu	r6, r6, 1						; actualizo puntero en SubImg
+	addu	r6, r6, 1					; actualizo puntero en SubImg
 	subu	r19, r19, 1
 	cmp		r5, r19, r0
 	bb1		gt, r5, BUC_COL_SM
@@ -322,39 +331,104 @@ BUC_COL_SM:
 	addu	r21, r17, 0					; puntero a primer elemento de siguiente fila
 	br		BUC_FIL_SM
 
-SM_EXTR:										; Bucle para copiar elemento en SubImg (dato en borde)
+SM_EXTR:								; Bucle para copiar elemento en SubImg (dato en borde)
 	st.b	r14, r6, 0					; Copiamos el elemento central en el primer hueco de SubImg
-	addu	r6, r6, 1						; Actualizamos el puntero al siguiente elemento
-	DBNZ	(r22, SM_EXTR)			; Usamos DBNZ para iterar por los nueve elementos de SubImg
-	br		FIN_SM
+	addu	r6, r6, 1					; Actualizamos el puntero al siguiente elemento
+	DBNZ	(r22, SM_EXTR)				; Usamos DBNZ para iterar por los nueve elementos de SubImg
+	br		SM_FIN
 
-FIN_SM:
+SM_FIN:
 	POP		(r1)
 	jmp		(r1)
 
-ValorPixel:									; ValorPixel (SubImg, MFiltro)
+ValorPixel:								; ValorPixel (SubImg, MFiltro)
 	PUSH	(r1)
 	or		r2, r0, r0					; r2 <- ACC = 0
 	or		r29, r0, r0					; r29 <- res = 0
-	ld		r4, r30, 8					; r4 <- dir SubImg
-	ld		r6, r30, 4					; r6 <- dir MFiltro
-	addu	r8, r0, 8						; r8 <- Contador de elementos por filtrar
+	ld		r4, r30, 8					; r4 <- dir MFiltro
+	ld		r6, r30, 4					; r6 <- dir SubImg
+	addu	r8, r0, 8					; r8 <- Contador de elementos por filtrar
 
 BUC_VPixel:
-	ld.b	r10, r4, 0					; r10 <- dato SubImg
-	ld.b	r11, r6, 0					; r11 <- dato Mfiltro
+	ld		r10, r4, 0					; r10 <- dato MFiltro
+	ld.b	r11, r6, 0					; r11 <- dato SubImg
 	muls	r12, r10, r11				; r12 <- dato_SubImg * dato_MFiltro
 	add		r2, r2, r12					; ACC = ACC + r12
-	addu	r4, r4, 1						; Actualiza puntero SubImg
-	addu	r6, r6, 1						; Actualiza puntero MFiltro
-	DBNZ	(r8, BUC_VPixel)
+	addu	r4, r4, 4					; Actualiza puntero MFiltro
+	addu	r6, r6, 1					; Actualiza puntero SubImg
+	subu	r8, r8, 1
+	cmp		r3, r8, 0
+	bb1		ge, r3, BUC_VPixel
 	or		r29, r2, 0					; r29 <- ACC
 	POP		(r1)
 	jmp		(r1)
 
-FilPixel:
+FilPixel:								; FilPixel (Imagen, i, j, MFiltro)
+	PUSH	(r1)
+	PUSH	(r31)
+	or		r31, r30, r30
+	subu	r30, r30, 12				; Reserva de 3 palabras (12 Bytes) para SubImg
+	; Carga de parámetros:
+	ld		r28, r31, 8					; dir Img
+	ld		r27, r31, 12				; i
+	ld		r26, r31, 16				; j
+	ld		r25, r31, 20				; dir MFiltro
+	addu	r24, r30, 0					; dir SubImg
+	; Llamada a SubMatriz:
+	PUSH	(r26)						; PUSH (j)
+	PUSH	(r27)						; PUSH (i)
+	PUSH	(r24)						; PUSH (SubImg)
+	PUSH	(r28)						; PUSH (Img)
+	bsr		SubMatriz
+	addu	r30, r30, 16				; "Borro" los PUSHes anteriores
+	PUSH	(r25)						; PUSH (MFiltro)
+	PUSH	(r24)						; PUSH (SubImg)
+	bsr		ValorPixel
+	addu	r30, r30, 4					; "Borro" el PUSH de SubImg, dejando el de MFiltro para la suma de peso
+	bsr		SUMA_PESO_MATRIZ
+	addu	r30, r30, 4					; "Borro" el PUSH anterior
+	cmp		r3, r4, r0					; ¿peso==0?
+	bb1		ne, r3, FP_PESO_NZ
+	;¿SI PESO=0, QUE PASA????????????????????
+FP_PESO_NZ:
+	divs	r29, r29, r4				; r29 <- r29/peso (r29 viene de ValorPixel)
+	cmp		r3, r29, r0
+	bb1		lt, r3, FP_RES_NEG			; ¿r29 < 0?
+	cmp		r5, r29, 255
+	bb1		gt, r5, FP_RES_IOB			; ¿r29 > 255?
+	br		FP_FIN
 
+FP_RES_NEG:
+	addu	r29, r0, r0					; r29 = 0
+	br		FP_FIN
+
+FP_RES_IOB:
+	addu	r29, r0, 255				; r29 = 255
+	br		FP_FIN
+
+FP_FIN:
+	or		r30, r31, 0
+	POP		(r31)
+	POP		(r1)
+	jmp		(r1)
+
+SUMA_PESO_MATRIZ:						; Matriz de 3x3 Bytes (9 elementos)
+	PUSH	(r1)
+	ld		r2, r30, 4					; r2 <- Matriz
+	addu	r4, r0, r0					; r4 <- peso = 0
+	addu	r6, r0, r0					; r6 <- contador = 0
+
+BUC_SUMA_PESO_MATRIZ:
+	ld		r8, r2, r6					; r8 <- di
+	add		r4, r4, r8					; peso = peso + di
+	addu	r6, r6, 1
+	cmp		r3, r6, 8
+	bb1		lt, r3, BUC_SUMA_PESO_MATRIZ
+	POP		(r1)
 	jmp		(r1)
 
 Filtro:
+	jmp		(r1)
+
+FiltRec:
 	jmp		(r1)

@@ -34,36 +34,36 @@ org 1000
 ;Pruebas Comp:
 
 Imagen1_data: data 3, 3
-  data	1, 1, 1
-  data	1, 1, 1
-  data	1, 1, 1
+  	data	1, 1, 1
+	data	1, 1, 1
+  	data	1, 1, 1
 
 Imagen2_data: data 3, 3
-  data	1, 1, 1
-  data	1, 1, 1
-  data	1, 1, 1
+  	data	1, 1, 1
+  	data	1, 1, 1
+  	data	1, 1, 1
 
 ;Pruebas ActualizaFiltro:
 
 Mfiltro_data:
-  data	1, 1, 1
-  data	1, 0, 1
-  data	1, 1, 1
+  	data	1, 1, 1
+  	data	1, 0, 1
+  	data	1, 1, 1
 
 Modfiltro_data: data 0, 0 		; Dupla
 
 ;Pruebas SubMatriz:
 
 Imagen_data2: data 3,5
-  data	0x04030201
-  data	0x05030505
-  data	0x03010503
-  data	0x00090705
+  	data	0x04030201
+  	data	0x05030505
+  	data	0x03010503
+  	data	0x00090705
 
 SubImg_data: ;data  3
 	data	1, 1, 1
-  data	1, 0, 1
-  data	1, 1, 1
+  	data	1, 0, 1
+  	data	1, 1, 1
 
 SubImg_res: res 12						; Reserva de espacio para almacenar SubImg
 
@@ -421,13 +421,29 @@ SUMA_PESO_MATRIZ:						; Matriz de 3x3 Bytes (9 elementos)
 BUC_SUMA_PESO_MATRIZ:
 	ld		r8, r2, r6					; r8 <- di
 	add		r4, r4, r8					; peso = peso + di
-	addu	r6, r6, 1
-	cmp		r3, r6, 8
+	addu	r6, r6, 4
+	cmp		r3, r6, 32
 	bb1		lt, r3, BUC_SUMA_PESO_MATRIZ
 	POP		(r1)
 	jmp		(r1)
 
-Filtro:
+Filtro:									; Filtro (Img, ImFilt, MFiltro)
+	PUSH	(r1)
+	PUSH	(r31)
+	or		r31, r30, r30
+	subu	r30, r30, 12				; Reservo 3 palabras para i, j y M*N
+	ld		r2, r31, 8					; dir Img
+	ld		r4, r2, 0					; M
+	ld		r6, r2, 4					; N
+	ld		r8, r31, 12					; dir ImFilt
+	st		r4, r8, 0					; Copio M en ImFilt
+	st		r6, r8, 4					; Copio N en ImFilt
+	mulu	r2, r4, r6					; M*N
+	st		r2, r30, 8					; Guardo M*N en Marco de pila
+	st		r0, r30, 4					; Inicializo contador j a 0 en Marco de pila
+	st		r0, r30, 0					; Inicializo contador i a 0 en Marco de pila
+Filtro_BUC_I:
+	
 	jmp		(r1)
 
 FiltRec:

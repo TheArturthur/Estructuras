@@ -390,12 +390,16 @@ FilPixel:								; FilPixel (Imagen, i, j, MFiltro)
 	PUSH	(r27)						; PUSH (i)
 	PUSH	(r24)						; PUSH (SubImg)
 	PUSH	(r28)						; PUSH (Img)
-	bsr		SubMatriz
+	bsr		SubMatriz					; (Img, SubImg, i, j)
+
 	addu	r30, r30, 16				; "Borro" los PUSHes anteriores
 	PUSH	(r25)						; PUSH (MFiltro)
-	PUSH	(r24)						; PUSH (SubI	addu	r30, r30, 4					; "Borro" el PUSH de SubImg, dejando el de MFiltro para la suma de peso
+	PUSH	(r24)						; PUSH (SubImg)
+	bsr		ValorPixel					; (SubImg, MFiltro)
+
+	addu	r30, r30, 4					; "Borro" el PUSH de SubImg, dejando MFiltro para la suma de peso
 	bsr		SUMA_PESO_MATRIZ
-	addu	r30, r30, 4					; "Borro" el PUSH anterior
+
 	cmp		r3, r4, r0					; ¿peso==0?
 	bb1		ne, r3, FP_PESO_NZ
 	br		FP_FIN						; Si peso =  0, acabo.
@@ -459,8 +463,11 @@ FILTRO_BUC_I:
 	ld		r2, r31, -20				; i
 	ld		r4, r31, -12				; M-1
 	cmp		r3, r2, r4
-	bb1		gt, r3, FILTRO_FIN
+	bb1		lt, r3, FILTRO_BUC_J
+	addu	r2, r0, r0
+	br		FILTRO_BUC_J
 FILTRO_BUC_J:
+	ld		r2, r31, -20				; i (lo puedo haber perdido)
 	ld		r6, r31, -16				; j
 	ld		r8, r31, -8					; N-1
 	cmp		r5, r6, r8
@@ -470,25 +477,31 @@ FILTRO_BUC_J:
 	PUSH	(r10)
 	PUSH	(r6)
 	PUSH	(r2)
-	PUSH	(r12)
-	bsr		FilPixel					; r29 <- valor retorno FilPixel
-	subu	r30, r30, 16				; "Borrado" de PUSHes
+	PUSH	(r12)						; (Img, i, j, MFiltro)
+	bsr		FilPixel					; r29 <- valor retorno FilPixel (byte)
+
+	subu	r30, r30, 16				; "Borrado" de PUSHes	
 	ld		r4, r31, 12					; ImFilt
-	addu	r4, r2, 8					; Primer dato ImFilt
-	ld		r2, r30, 0					; i
-	ld		r6, r30, 4					; j
+	addu	r4, r4, 8					; Primer dato ImFilt
+	ld		r2, r31, -20				; i
+	ld		r6, r31, -16				; j
 	ld		r8, r31, -12				; M-1
 	ld		r9, r31, -8					; N-1
-	mulu	r10, r2, r9					; Fila deseada
+	addu	r10, r0, r4					; Primer dato ImFilt (copia)
+	mulu	r11, r2, r9					; i*(M-1)
+	addu	r10, r10, r11				; Fila deseada
 	addu	r10, r10, r6				; Dato deseado
-	st		r29, r4, r10				; Guardo valor Filtrado en ImFilt
+	st.b	r29, r10, r0				; Guardo valor Filtrado en ImFilt
 	addu	r6, r6, 1					; j = j+1
-	st		r6, r30, 4					; Actualizo j en pila
+	st		r6, r31, -16				; Actualizo j en pila
 	br		FILTRO_BUC_J
 FILTRO_CAMB_I:
 	ld		r2, r31, -20				; i
+	ld		r4, r31, -8					; M-1
+	cmp		r5, r2, r4
+	bb1		eq, r5, FILTRO_FIN			; Si i=M-1, FIN
 	addu	r2, r2, 1					; i = i+1
-	st		r2, r30, 0					; Actualizo i en pila
+	st		r2, r31, -20				; Actualizo i en pila
 	br		FILTRO_BUC_I
 FILTRO_FIN:
 	or		r30, r31, r31

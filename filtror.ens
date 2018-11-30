@@ -67,6 +67,9 @@ SubImg_data: ;data  3
 
 SubImg_res: res 12						; Reserva de espacio para almacenar SubImg
 
+ImFiltrada:
+	data 0, 0
+	data 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF
 org 0x2000
 IMAGEN:
 	data 3, 3
@@ -75,10 +78,19 @@ IMAGEN:
 org 0x2040
 SUBIMAGEN:
 	data 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF
-;Pruebas ValorPixel:
 
 ;Pruebas Filtro:
-
+PPALFiltro:
+	LEA		(r30, 60000)
+	LEA		(r2, Mfiltro_data)
+	PUSH	(r2)
+	LEA		(r2, ImFiltrada)
+	PUSH	(r2)
+	LEA		(r2, IMAGEN)
+	PUSH	(r2)
+	bsr		Filtro
+	stop
+	
 ;Pruebas FilPixel:
 PPALFilPixel:
 	LEA		(r30, 60000)
@@ -176,7 +188,6 @@ PPALVPixel:
   LEA	(r11, Mfiltro_data)				; de pruebas
   PUSH	(r10)
   PUSH	(r11)
-  bsr 	ValorPixel
   stop
 
 ;
@@ -340,7 +351,7 @@ SM_EXTR:								; Bucle para copiar elemento en SubImg (dato en borde)
 SM_FIN:
 	POP		(r1)
 	jmp		(r1)
-
+	
 ValorPixel:								; ValorPixel (SubImg, MFiltro)
 	PUSH	(r1)
 	or		r2, r0, r0					; r2 <- ACC = 0
@@ -382,16 +393,14 @@ FilPixel:								; FilPixel (Imagen, i, j, MFiltro)
 	bsr		SubMatriz
 	addu	r30, r30, 16				; "Borro" los PUSHes anteriores
 	PUSH	(r25)						; PUSH (MFiltro)
-	PUSH	(r24)						; PUSH (SubImg)
-	bsr		ValorPixel
-	addu	r30, r30, 4					; "Borro" el PUSH de SubImg, dejando el de MFiltro para la suma de peso
+	PUSH	(r24)						; PUSH (SubI	addu	r30, r30, 4					; "Borro" el PUSH de SubImg, dejando el de MFiltro para la suma de peso
 	bsr		SUMA_PESO_MATRIZ
 	addu	r30, r30, 4					; "Borro" el PUSH anterior
 	cmp		r3, r4, r0					; ¿peso==0?
 	bb1		ne, r3, FP_PESO_NZ
-	;¿SI PESO=0, QUE PASA????????????????????
+	br		FP_FIN						; Si peso =  0, acabo.
 FP_PESO_NZ:
-	divs	r29, r29, r4				; r29 <- r29/peso (r29 viene de ValorPixel)
+	divs	r29, r29, r4				; r29 <- r29/peso (r29)
 	cmp		r3, r29, r0
 	bb1		lt, r3, FP_RES_NEG			; ¿r29 < 0?
 	cmp		r5, r29, 255
@@ -407,7 +416,7 @@ FP_RES_IOB:
 	br		FP_FIN
 
 FP_FIN:
-	or		r30, r31, 0
+	or		r30, r31, r31
 	POP		(r31)
 	POP		(r1)
 	jmp		(r1)
@@ -431,7 +440,7 @@ Filtro:									; Filtro (Img, ImFilt, MFiltro)
 	PUSH	(r1)
 	PUSH	(r31)
 	or		r31, r30, r30
-	subu	r30, r30, 12				; Reservo 3 palabras para i, j y M*N
+	subu	r30, r30, 20				; Reservo 5 palabras para i, j, M-1, N-1 y M*N
 	ld		r2, r31, 8					; dir Img
 	ld		r4, r2, 0					; M
 	ld		r6, r2, 4					; N
@@ -439,11 +448,52 @@ Filtro:									; Filtro (Img, ImFilt, MFiltro)
 	st		r4, r8, 0					; Copio M en ImFilt
 	st		r6, r8, 4					; Copio N en ImFilt
 	mulu	r2, r4, r6					; M*N
-	st		r2, r30, 8					; Guardo M*N en Marco de pila
-	st		r0, r30, 4					; Inicializo contador j a 0 en Marco de pila
-	st		r0, r30, 0					; Inicializo contador i a 0 en Marco de pila
-Filtro_BUC_I:
-	
+	st		r2, r31, -4					; Guardo M*N en Marco de pila
+	st		r0, r31, -16				; Inicializo contador j a 0 en Marco de pila
+	st		r0, r31, -20				; Inicializo contador i a 0 en Marco de pila
+	subu	r4, r4, 1					; M-1
+	subu	r6, r6, 1					; N-1
+	st		r4, r31, -12				; Guardo M-1
+	st		r6, r31, -8					; Guardo N-1
+FILTRO_BUC_I:
+	ld		r2, r31, -20				; i
+	ld		r4, r31, -12				; M-1
+	cmp		r3, r2, r4
+	bb1		gt, r3, FILTRO_FIN
+FILTRO_BUC_J:
+	ld		r6, r31, -16				; j
+	ld		r8, r31, -8					; N-1
+	cmp		r5, r6, r8
+	bb1		gt, r5, FILTRO_CAMB_I
+	ld		r10, r31, 16				; MFiltro
+	ld		r12, r31, 8					; dir Img
+	PUSH	(r10)
+	PUSH	(r6)
+	PUSH	(r2)
+	PUSH	(r12)
+	bsr		FilPixel					; r29 <- valor retorno FilPixel
+	subu	r30, r30, 16				; "Borrado" de PUSHes
+	ld		r4, r31, 12					; ImFilt
+	addu	r4, r2, 8					; Primer dato ImFilt
+	ld		r2, r30, 0					; i
+	ld		r6, r30, 4					; j
+	ld		r8, r31, -12				; M-1
+	ld		r9, r31, -8					; N-1
+	mulu	r10, r2, r9					; Fila deseada
+	addu	r10, r10, r6				; Dato deseado
+	st		r29, r4, r10				; Guardo valor Filtrado en ImFilt
+	addu	r6, r6, 1					; j = j+1
+	st		r6, r30, 4					; Actualizo j en pila
+	br		FILTRO_BUC_J
+FILTRO_CAMB_I:
+	ld		r2, r31, -20				; i
+	addu	r2, r2, 1					; i = i+1
+	st		r2, r30, 0					; Actualizo i en pila
+	br		FILTRO_BUC_I
+FILTRO_FIN:
+	or		r30, r31, r31
+	POP		(r31)
+	POP		(r1)
 	jmp		(r1)
 
 FiltRec:

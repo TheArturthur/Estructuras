@@ -1,467 +1,314 @@
-Fecha: 12/11/18     21:09
+Fecha: 26/11/18     21:08
 
 
-	Esta ha sido la última corrección seleccionable de su código en el periodo actual
+	Le quedan 2 correcciones seleccionables en el periodo actual
 
 ------------------------------------------------------------------
-Su implementación falla en una prueba en que se hace lo siguiente:
-- Llama a 'ActualizaFiltro' pasándole una matriz de filtro con todos
-sus elementos iguales y una dupla que modifica el filtro dividiendo a la
-mitad cada uno de sus elementos
-------------------------------------------------------------------
-Su implementación falla en una prueba en que se hace lo siguiente:
-- Llama a 'ActualizaFiltro' pasándole una matriz de filtro formada por
-nueve elementos distintos y una dupla que modifica el filtro dividiendo
-a la mitad cada uno de sus elementos
-------------------------------------------------------------------
-Su implementación falla en una prueba en que se hace lo siguiente:
-- Llama a 'ActualizaFiltro' pasándole una matriz de filtro con todos
-sus elementos iguales y una dupla que multiplica por dos cada uno
-de los elementos del filtro
-Los registros parten de valores distintos de 0.
-------------------------------------------------------------------
-Su implementación falla en una prueba en que se hace lo siguiente:
-- Llama a 'ActualizaFiltro' pasándole una matriz de filtro formada por
-nueve elementos distintos y una dupla que multiplica por dos cada uno
-de los elementos del filtro
-------------------------------------------------------------------
-Su implementación falla en una prueba en que se hace lo siguiente:
-- Llama a 'ActualizaFiltro' pasándole una matriz de filtro con
-nueve elementos distintos y una dupla con numerador nulo
-------------------------------------------------------------------
-Su implementación falla en una prueba en que se hace lo siguiente:
-- Llama a 'ActualizaFiltro' pasándole una matriz de filtro con
-nueve elementos distintos y una dupla con denominador nulo
-------------------------------------------------------------------
-Su implementación falla en una prueba en que se hace lo siguiente:
-- Llama a 'ActualizaFiltro' pasándole una matriz de filtro con
-nueve elementos distintos y una dupla con numerador y denominador
-nulos
-------------------------------------------------------------------
-Su implementación falla en una prueba en que se hace lo siguiente:
-- Llama a 'ActualizaFiltro' pasándole una matriz de filtro formada por
-nueve elementos distintos y una dupla formada por dos elementos con uno
-de ellos negativo
-------------------------------------------------------------------
-Su implementación falla en una prueba en que se hace lo siguiente:
-- Llama a 'ActualizaFiltro' pasándole una matriz de filtro con
-nueve elementos distintos y una dupla que provoca una puesta a
-cero de esos elementos.
-------------------------------------------------------------------
-Su implementación falla en una prueba en que se hace lo siguiente:
-- Llama a 'ActualizaFiltro' pasándole una matriz de filtro con
-nueve elementos distintos y una dupla que provoca un aumento
-significativo del valor de esos elementos.
-------------------------------------------------------------------
-Su implementación falla en una prueba en que se hace lo siguiente:
-- Llama a 'Comp', pasándole dos imágenes identicas de
+Su implementaciï¿½n falla en una prueba en que se hace lo siguiente:
+- Llama a 'Comp', pasï¿½ndole dos imï¿½genes identicas de
 3x3 elementos.
 ------------------------------------------------------------------
-Su implementación falla en una prueba en que se hace lo siguiente:
-- Llama a Comp, pasándole dos imágenes diferentes de
+Su implementaciï¿½n falla en una prueba en que se hace lo siguiente:
+- Llama a 'Comp', pasï¿½ndole dos imï¿½genes de 4x8 elementos
+que difieren en uno solo de ellos.
+------------------------------------------------------------------
+Su implementaciï¿½n falla en una prueba en que se hace lo siguiente:
+- Llama a Comp, pasï¿½ndole dos imï¿½genes diferentes de
 4x8 elementos.
 ------------------------------------------------------------------
-Su implementación falla en una prueba en que se hace lo siguiente:
-- Llama a 'Comp', pasándole dos imágenes de 4x8 elementos
+Su implementaciï¿½n falla en una prueba en que se hace lo siguiente:
+- Llama a 'Comp', pasï¿½ndole dos imï¿½genes de 4x8 elementos
 en las que difieren todos sus elementos en una o en dos
 unidades.
 ------------------------------------------------------------------
-Su implementación falla en una prueba en que se hace lo siguiente:
-- Llama a 'Comp', pasándole dos imágenes de 8x8 elementos
+Su implementaciï¿½n falla en una prueba en que se hace lo siguiente:
+- Llama a 'Comp', pasï¿½ndole dos imï¿½genes de 8x8 elementos
 en las que todos sus elementos difieren en +/-1.
 ------------------------------------------------------------------
-Su implementación falla en una prueba en que se hace lo siguiente:
-- Llama a 'Comp', pasándole dos imágenes de 8x8 elementos
+Su implementaciï¿½n falla en una prueba en que se hace lo siguiente:
+- Llama a 'Comp', pasï¿½ndole dos imï¿½genes de 8x8 elementos
 en las que todos sus elementos difieren en +/-1. Los
 registros parten de valores distintos de 0.
 ------------------------------------------------------------------
-Su implementación falla en una prueba en que se hace lo siguiente:
-- Llama a 'Comp', pasándole dos imágenes de 4x5 elementos
+Su implementaciï¿½n falla en una prueba en que se hace lo siguiente:
+- Llama a 'Comp', pasï¿½ndole dos imï¿½genes de 4x5 elementos
 en las que difieren varios de ellos.
 ------------------------------------------------------------------
-Su implementación falla en una prueba en que se hace lo siguiente:
-- Llama a 'SubMatriz', pasándole una imagen de 3x3 elementos
-de la que se ha de extraer la subimagen correspondiente al
-elemento central.
-------------------------------------------------------------------
-Su implementación falla en una prueba en que se hace lo siguiente:
-- Llama a 'SubMatriz', pasándole una imagen de 3x3 elementos
-de la que se ha de extraer la subimagen correspondiente a una
-esquina (inferior izquierda).
-------------------------------------------------------------------
-Su implementación falla en una prueba en que se hace lo siguiente:
-- Llama a 'SubMatriz', pasándole una imagen de 3x3 elementos
-de la que se ha de extraer la subimagen correspondiente a un
-píxel de la fila inferior.
-------------------------------------------------------------------
-Su implementación falla en una prueba en que se hace lo siguiente:
-- Llama a 'SubMatriz', pasándole una imagen de 5x5 elementos
-de la que se ha de extraer la subimagen correspondiente a uno
-de los píxeles del interior.
-------------------------------------------------------------------
-Su implementación falla en una prueba en que se hace lo siguiente:
-- Llama a 'SubMatriz', pasándole una imagen de 5x5 elementos
-de la que se ha de extraer la subimagen correspondiente a uno
-de los píxeles del interior.
-Los registros parten de valores distintos de 0.
-------------------------------------------------------------------
-Su implementación falla en una prueba en que se hace lo siguiente:
-- Llama a 'SubMatriz', pasándole una imagen de 5x5 elementos
-de la que se ha de extraer la subimagen correspondiente a una
-esquina (inferior derecha).
-------------------------------------------------------------------
-Su implementación falla en una prueba en que se hace lo siguiente:
-- Llama a 'SubMatriz', pasándole una imagen de 5x5 elementos
-de la que se ha de extraer la subimagen correspondiente a un
-píxel de la primera columna.
-------------------------------------------------------------------
-Su implementación falla en una prueba en que se hace lo siguiente:
-- Llama a 'SubMatriz', pasándole una imagen de 5x8 elementos
-de la que se ha de extraer la subimagen correspondiente a uno
-de los píxeles del interior.
-------------------------------------------------------------------
-Su implementación falla en una prueba en que se hace lo siguiente:
-- Llama a 'SubMatriz', pasándole una imagen de 5x8 elementos
-de la que se ha de extraer la subimagen correspondiente a uno
-de los píxeles de la última columna.
-------------------------------------------------------------------
-Su implementación falla en una prueba en que se hace lo siguiente:
-- Llama a 'SubMatriz', pasándole una imagen de 5x8 elementos
-de la que se ha de extraer la subimagen correspondiente a uno
-de los píxeles del interior de la imagen.
-Los registros parten de valores distintos de 0.
-------------------------------------------------------------------
-Su implementación falla en una prueba en que se hace lo siguiente:
-- Llama a 'ValorPixel', pasándole una subimagen nula excepto
-en su elemento central y un filtro identidad.
-------------------------------------------------------------------
-Su implementación falla en una prueba en que se hace lo siguiente:
-- Llama a 'ValorPixel', pasándole una subimagen no nula y un filtro
-que dobla y cambia el signo del elemento al que se aplica.
-------------------------------------------------------------------
-Su implementación falla en una prueba en que se hace lo siguiente:
-- Llama a 'ValorPixel', pasándole una subimagen no nula y un filtro
-que duplica el valor del elemento sobre el que se aplica.
-------------------------------------------------------------------
-Su implementación falla en una prueba en que se hace lo siguiente:
-- Llama a 'ValorPixel', pasándole una subimagen no nula y un filtro
-que devuelve el doble de la suma de los ocho elementos que lo rodean
-y que excede del valor máximo de un píxel.
-------------------------------------------------------------------
-Su implementación falla en una prueba en que se hace lo siguiente:
-- Llama a 'ValorPixel', pasándole una subimagen no nula y un filtro
-que devuelve el valor negativo del doble de la suma de los ocho
-elementos que lo rodean.
-Los registros parten de valores distintos de 0.
-------------------------------------------------------------------
-Su implementación falla en una prueba en que se hace lo siguiente:
-- Llama a 'ValorPixel', pasándole una subimagen no nula y un filtro
-que devuelve la suma de los ocho elementos que lo rodean y supera
-el valor máximo admitido para un elemento de la imagen.
-Los registros parten de valores distintos de 0.
-------------------------------------------------------------------
-Su implementación falla en una prueba en que se hace lo siguiente:
-- Llama a 'ValorPixel', pasándole una subimagen no nula y un filtro
-que devuelve la suma de los elementos de la fila superior y la
-inferior a la del pixel a filtrar.
-Los registros parten de valores distintos de 0.
-------------------------------------------------------------------
-Su implementación falla en una prueba en que se hace lo siguiente:
-- Llama a 'ValorPixel', pasándole una subimagen no nula y un filtro
-que devuelve un valor que es función de los ocho elementos que le
-rodean, de modo que el resultado supera el valor máximo de un
+Su implementaciï¿½n falla en una prueba en que se hace lo siguiente:
+- Llama a 'ValorPixel', pasï¿½ndole una subimagen no nula y un filtro
+que devuelve un valor que es funciï¿½n de los ocho elementos que le
+rodean, de modo que el resultado supera el valor mï¿½ximo de un
 elemento de la imagen.
-El valor de retorno no está inicializado en el programa principal.
+El valor de retorno no estï¿½ inicializado en el programa principal.
 ------------------------------------------------------------------
-Su implementación falla en una prueba en que se hace lo siguiente:
-- Llama a 'ValorPixel', pasándole una subimagen no nula y un filtro
-que devuelve un valor que es función de los ocho elementos que le
+Su implementaciï¿½n falla en una prueba en que se hace lo siguiente:
+- Llama a 'ValorPixel', pasï¿½ndole una subimagen no nula y un filtro
+que devuelve un valor que es funciï¿½n de los ocho elementos que le
 rodean, de modo que el resultado es negativo.
-El valor de retorno no está inicializado en el programa principal.
+El valor de retorno no estï¿½ inicializado en el programa principal.
 ------------------------------------------------------------------
-Su implementación falla en una prueba en que se hace lo siguiente:
+Su implementaciï¿½n falla en una prueba en que se hace lo siguiente:
 - Llama a 'FilPixel', pasando una imagen de 4x8 elementos y un filtro
 identidad que se aplica a un elemento del interior de la imagen.
 ------------------------------------------------------------------
-Su implementación falla en una prueba en que se hace lo siguiente:
-- Llama a 'FilPixel', pasándole una imagen de 5x5 elementos y un filtro
+Su implementaciï¿½n falla en una prueba en que se hace lo siguiente:
+- Llama a 'FilPixel', pasï¿½ndole una imagen de 5x5 elementos y un filtro
 identidad que se aplica a un elemento del interior de la imagen.
 ------------------------------------------------------------------
-Su implementación falla en una prueba en que se hace lo siguiente:
-- Llama a 'FilPixel', pasándole una imagen de 4x8 elementos y un filtro
+Su implementaciï¿½n falla en una prueba en que se hace lo siguiente:
+- Llama a 'FilPixel', pasï¿½ndole una imagen de 4x8 elementos y un filtro
 que cambia el signo del elemento al que se aplica y le suma el valor
 del elemento situado en la misma columna y en la fila anterior.
 ------------------------------------------------------------------
-Su implementación falla en una prueba en que se hace lo siguiente:
-- Llama a 'FilPixel', pasándole una imagen de 4x8 elementos y un filtro
+Su implementaciï¿½n falla en una prueba en que se hace lo siguiente:
+- Llama a 'FilPixel', pasï¿½ndole una imagen de 4x8 elementos y un filtro
 que duplica el valor del elemento sobre el que se aplica y le resta
 el valor del situado a su izquierda.
 ------------------------------------------------------------------
-Su implementación falla en una prueba en que se hace lo siguiente:
-- Llama a 'FilPixel', pasándole una imagen de 4x8 elementos y un
+Su implementaciï¿½n falla en una prueba en que se hace lo siguiente:
+- Llama a 'FilPixel', pasï¿½ndole una imagen de 4x8 elementos y un
 filtro que devuelve la media de los ocho elementos que lo rodean.
 ------------------------------------------------------------------
-Su implementación falla en una prueba en que se hace lo siguiente:
-- Llama a 'FilPixel', pasándole una imagen de 4x8 elementos y un filtro
-que devuelve una suma ponderada de los ocho elementos que lo rodean.
+Su implementaciï¿½n falla en una prueba en que se hace lo siguiente:
+- Llama a 'FilPixel', pasï¿½ndole una imagen de 4x8 elementos, con
+varios elementos nulos, otros cercanos al mï¿½ximo y un filtro que
+opera con los valores cercanos al mï¿½ximo.
 ------------------------------------------------------------------
-Su implementación falla en una prueba en que se hace lo siguiente:
-- Llama a 'FilPixel', pasándole una imagen de 4x8 elementos, con
-varios elementos nulos, otros cercanos al máximo y un filtro que
-opera con los valores cercanos al máximo.
-------------------------------------------------------------------
-Su implementación falla en una prueba en que se hace lo siguiente:
-- Llama a 'FilPixel', pasándole una imagen de 4x8 elementos y un filtro
+Su implementaciï¿½n falla en una prueba en que se hace lo siguiente:
+- Llama a 'FilPixel', pasï¿½ndole una imagen de 4x8 elementos y un filtro
 que devuelve la suma promediada de los elementos de la columna izquierda
-y la resta de los de la columna derecha del píxel seleccionado.
+y la resta de los de la columna derecha del pï¿½xel seleccionado.
 ------------------------------------------------------------------
-Su implementación falla en una prueba en que se hace lo siguiente:
-- Llama a 'FilPixel', pasándole una imagen de 4x8 elementos y un filtro con
-peso cero que multiplica por -8 el valor del píxel y le suma el valor de los
-ocho píxeles que lo rodean. El resultado se ajusta al valor mínimo (0).
+Su implementaciï¿½n falla en una prueba en que se hace lo siguiente:
+- Llama a 'FilPixel', pasï¿½ndole una imagen de 4x8 elementos y un filtro con
+peso cero que multiplica por -8 el valor del pï¿½xel y le suma el valor de los
+ocho pï¿½xeles que lo rodean. El resultado se ajusta al valor mï¿½nimo (0).
 Los registros parten de valores distintos de 0.
 ------------------------------------------------------------------
-Su implementación falla en una prueba en que se hace lo siguiente:
-- Llama a 'FilPixel', pasándole una imagen de 4x6 elementos y un
-filtro que devuelve un valor que es función de los ocho elementos
-que rodean al pixel. El resultado está limitado al valor máximo.
+Su implementaciï¿½n falla en una prueba en que se hace lo siguiente:
+- Llama a 'FilPixel', pasï¿½ndole una imagen de 4x6 elementos y un
+filtro que devuelve un valor que es funciï¿½n de los ocho elementos
+que rodean al pixel. El resultado estï¿½ limitado al valor mï¿½ximo.
 Los registros parten de valores distintos de 0.
 ------------------------------------------------------------------
-Su implementación falla en una prueba en que se hace lo siguiente:
-- Llama a 'Filtro' pasándole una imagen no nula de 4x8 elementos y
+Su implementaciï¿½n falla en una prueba en que se hace lo siguiente:
+- Llama a 'Filtro' pasï¿½ndole una imagen no nula de 4x8 elementos y
 un filtro que devuelve para cada elemento su media con los dos
 vecinos de la misma fila.
 ------------------------------------------------------------------
-Su implementación falla en una prueba en que se hace lo siguiente:
-- Llama a 'Filtro' pasándole una imagen no nula de 4x8 elementos y
+Su implementaciï¿½n falla en una prueba en que se hace lo siguiente:
+- Llama a 'Filtro' pasï¿½ndole una imagen no nula de 4x8 elementos y
 un filtro que devuelve para cada elemento su media con los dos vecinos
 de la misma diagonal (de NO a SE).
 ------------------------------------------------------------------
-Su implementación falla en una prueba en que se hace lo siguiente:
-- Llama a 'Filtro' pasándole una imagen no nula de 4x8 elementos y
+Su implementaciï¿½n falla en una prueba en que se hace lo siguiente:
+- Llama a 'Filtro' pasï¿½ndole una imagen no nula de 4x8 elementos y
 un filtro que sustituye cada elemento por la media de los que le
 rodean.
 ------------------------------------------------------------------
-Su implementación falla en una prueba en que se hace lo siguiente:
-- Llama a 'Filtro' pasándole una imagen no nula de 4x8 elementos y
+Su implementaciï¿½n falla en una prueba en que se hace lo siguiente:
+- Llama a 'Filtro' pasï¿½ndole una imagen no nula de 4x8 elementos y
 un filtro que sustituye cada elemento por la media de los que le
 rodean.
 Los registros parten de valores distintos de 0.
 ------------------------------------------------------------------
-Su implementación falla en una prueba en que se hace lo siguiente:
-- Llama a 'Filtro' pasándole una imagen no nula de 4x8 elementos y
+Su implementaciï¿½n falla en una prueba en que se hace lo siguiente:
+- Llama a 'Filtro' pasï¿½ndole una imagen no nula de 4x8 elementos y
 un filtro que multiplica por 4 cada elemento y le resta tres veces el
 valor del situado en la misma columna de la fila anterior.
-Algunos elementos alcanzan el valor máximo y otros el mínimo.
+Algunos elementos alcanzan el valor mï¿½ximo y otros el mï¿½nimo.
 ------------------------------------------------------------------
-Su implementación falla en una prueba en que se hace lo siguiente:
-- Llama a 'Filtro' pasándole una imagen no nula de 4x6 elementos
+Su implementaciï¿½n falla en una prueba en que se hace lo siguiente:
+- Llama a 'Filtro' pasï¿½ndole una imagen no nula de 4x6 elementos
 y un filtro identidad, que devuelve la misma imagen recibida.
 ------------------------------------------------------------------
-Su implementación falla en una prueba en que se hace lo siguiente:
-- Llama a 'Filtro' pasándole una imagen no nula de 4x5 elementos y
+Su implementaciï¿½n falla en una prueba en que se hace lo siguiente:
+- Llama a 'Filtro' pasï¿½ndole una imagen no nula de 4x5 elementos y
 un filtro que multiplica por 4 cada elemento y le resta tres veces el
 valor del situado en la misma columna de la fila anterior.
-Algunos elementos alcanzan el valor máximo.
+Algunos elementos alcanzan el valor mï¿½ximo.
 ------------------------------------------------------------------
-Su implementación falla en una prueba en que se hace lo siguiente:
-- Llama a 'Filtro' pasándole una imagen no nula de 4x5 elementos y
+Su implementaciï¿½n falla en una prueba en que se hace lo siguiente:
+- Llama a 'Filtro' pasï¿½ndole una imagen no nula de 4x5 elementos y
 un filtro que multiplica por 4 cada elemento y le resta tres veces el
 valor del situado en la misma columna de la fila anterior.
 Los registros parten de valores distintos de 0 y algunos elementos
-alcanzan el valor máximo o el mínimo.
+alcanzan el valor mï¿½ximo o el mï¿½nimo.
 ------------------------------------------------------------------
-Su implementación falla en una prueba en que se hace lo siguiente:
-- Llama a 'Filtro' pasándole una imagen de 4x6 elementos y un
+Su implementaciï¿½n falla en una prueba en que se hace lo siguiente:
+- Llama a 'Filtro' pasï¿½ndole una imagen de 4x6 elementos y un
 filtro que tiene algunos coeficientes negativos.
 ------------------------------------------------------------------
-Su implementación falla en una prueba en que se hace lo siguiente:
-- Llama a 'Filtro' pasándole una imagen de 4x6 elementos y un
-filtro que sustituye cada píxel por la media de los que están
-situados en los cuatro vértices de la submatriz que lo rodea.
+Su implementaciï¿½n falla en una prueba en que se hace lo siguiente:
+- Llama a 'Filtro' pasï¿½ndole una imagen de 4x6 elementos y un
+filtro que sustituye cada pï¿½xel por la media de los que estï¿½n
+situados en los cuatro vï¿½rtices de la submatriz que lo rodea.
 El filtro utiliza coeficientes negativos.
 ------------------------------------------------------------------
-Su implementación falla en una prueba en que se hace lo siguiente:
+Su implementaciï¿½n falla en una prueba en que se hace lo siguiente:
 - Llama a 'FiltRec' sobre una imagen de 4x4 elementos, con un
-filtro que devuelve para cada píxel la media de los que lo
+filtro que devuelve para cada pï¿½xel la media de los que lo
 rodean.
-La dupla de actualización no modifica el filtro, el parámetro
+La dupla de actualizaciï¿½n no modifica el filtro, el parï¿½metro
 NCambios tiene valor 40 y nF se inicia a 4.
 ------------------------------------------------------------------
-Su implementación falla en una prueba en que se hace lo siguiente:
+Su implementaciï¿½n falla en una prueba en que se hace lo siguiente:
 - Llama a 'FiltRec' sobre una imagen de 4x4 elementos, con un
-filtro que devuelve para cada píxel la media de los que lo
+filtro que devuelve para cada pï¿½xel la media de los que lo
 rodean.
-La dupla de actualización divide entre dos los valores del filtro,
-el parámetro NCambios tiene valor 1 y nF se inicia a 4.
+La dupla de actualizaciï¿½n divide entre dos los valores del filtro,
+el parï¿½metro NCambios tiene valor 1 y nF se inicia a 4.
 ------------------------------------------------------------------
-Su implementación falla en una prueba en que se hace lo siguiente:
+Su implementaciï¿½n falla en una prueba en que se hace lo siguiente:
 - Llama a 'FiltRec' sobre una imagen de 4x4 elementos, con un
-filtro que devuelve para cada píxel la media de los que lo
+filtro que devuelve para cada pï¿½xel la media de los que lo
 rodean.
-La dupla de actualización multiplica por dos los valores del filtro,
-el parámetro NCambios tiene valor 1 y nF se inicia a 4.
+La dupla de actualizaciï¿½n multiplica por dos los valores del filtro,
+el parï¿½metro NCambios tiene valor 1 y nF se inicia a 4.
 ------------------------------------------------------------------
-Su implementación falla en una prueba en que se hace lo siguiente:
+Su implementaciï¿½n falla en una prueba en que se hace lo siguiente:
 - Llama a 'FiltRec' sobre una imagen de 4x4 elementos, con un
 filtro formado por coeficientes distintos de "1" que devuelve para
-cada píxel la media de los que lo rodean.
-La dupla de actualización divide entre dos los valores del filtro,
-el parámetro NCambios tiene valor 1 y nF se inicia a 4.
+cada pï¿½xel la media de los que lo rodean.
+La dupla de actualizaciï¿½n divide entre dos los valores del filtro,
+el parï¿½metro NCambios tiene valor 1 y nF se inicia a 4.
 ------------------------------------------------------------------
-Su implementación falla en una prueba en que se hace lo siguiente:
+Su implementaciï¿½n falla en una prueba en que se hace lo siguiente:
 - Llama a 'FiltRec' sobre una imagen de 4x4 elementos, con un
 filtro formado por coeficientes distintos de "1" que devuelve para
-cada píxel la media de los que lo rodean.
-La dupla de actualización modifica el filtro, el parámetro
+cada pï¿½xel la media de los que lo rodean.
+La dupla de actualizaciï¿½n modifica el filtro, el parï¿½metro
 NCambios tiene valor 0 y nF se inicia a 4.
 ------------------------------------------------------------------
-Su implementación falla en una prueba en que se hace lo siguiente:
+Su implementaciï¿½n falla en una prueba en que se hace lo siguiente:
 - Llama a 'FiltRec' sobre una imagen de 4x4 elementos, con un
 filtro formado por coeficientes distintos de "1" que devuelve para
-cada píxel la media de los que lo rodean.
-La dupla de actualización modifica el filtro, el parámetro
+cada pï¿½xel la media de los que lo rodean.
+La dupla de actualizaciï¿½n modifica el filtro, el parï¿½metro
 NCambios tiene valor 0 y nF se inicia a 10.
 ------------------------------------------------------------------
-Su implementación falla en una prueba en que se hace lo siguiente:
+Su implementaciï¿½n falla en una prueba en que se hace lo siguiente:
 - Llama a 'FiltRec' sobre una imagen de 4x8 elementos, con un
-filtro que devuelve para cada píxel una media ponderada de los
+filtro que devuelve para cada pï¿½xel una media ponderada de los
 que lo rodean.
-La dupla de actualización no modifica el filtro, el parámetro
+La dupla de actualizaciï¿½n no modifica el filtro, el parï¿½metro
 NCambios tiene valor 1 y nF se inicia a 4.
 ------------------------------------------------------------------
-Su implementación falla en una prueba en que se hace lo siguiente:
+Su implementaciï¿½n falla en una prueba en que se hace lo siguiente:
 - Llama a 'FiltRec' sobre una imagen de 4x8 elementos, con un
-filtro que devuelve para cada píxel una media ponderada de los
+filtro que devuelve para cada pï¿½xel una media ponderada de los
 que lo rodean.
-La dupla de actualización multiplica por dos los valores del filtro,
-el parámetro NCambios tiene valor 1 y nF se inicia a 4.
+La dupla de actualizaciï¿½n multiplica por dos los valores del filtro,
+el parï¿½metro NCambios tiene valor 1 y nF se inicia a 4.
 ------------------------------------------------------------------
-Su implementación falla en una prueba en que se hace lo siguiente:
+Su implementaciï¿½n falla en una prueba en que se hace lo siguiente:
 - Llama a 'FiltRec' sobre una imagen de 4x5 elementos, con un
-filtro que devuelve para cada píxel una media ponderada de los
+filtro que devuelve para cada pï¿½xel una media ponderada de los
 que lo rodean.
-La dupla de actualización multiplica por dos los valores del filtro,
-el parámetro NCambios tiene valor 1 y nF se inicia a 4.
+La dupla de actualizaciï¿½n multiplica por dos los valores del filtro,
+el parï¿½metro NCambios tiene valor 1 y nF se inicia a 4.
 ------------------------------------------------------------------
-Su implementación falla en una prueba en que se hace lo siguiente:
+Su implementaciï¿½n falla en una prueba en que se hace lo siguiente:
 - Llama a 'FiltRec' sobre una imagen de 5x5 elementos, con un
-filtro que devuelve para cada píxel una media ponderada de los
+filtro que devuelve para cada pï¿½xel una media ponderada de los
 que lo rodean.
-La dupla de actualización decrementa levemente los valores del filtro,
-el parámetro NCambios tiene valor 1 y nF se inicia a 5.
+La dupla de actualizaciï¿½n decrementa levemente los valores del filtro,
+el parï¿½metro NCambios tiene valor 1 y nF se inicia a 5.
 ------------------------------------------------------------------
-Su implementación falla en una prueba en que se hace lo siguiente:
+Su implementaciï¿½n falla en una prueba en que se hace lo siguiente:
 - Llama a 'FiltRec' sobre una imagen de 5x5 elementos, con un
 filtro que sustituye cada elemento por el doble de su valor menos el
 doble del valor de los situados a su izquierda y a su derecha.
-La dupla de actualización incrementa levemente los valores del filtro,
-el parámetro NCambios tiene valor 1 y nF se inicia a 10.
+La dupla de actualizaciï¿½n incrementa levemente los valores del filtro,
+el parï¿½metro NCambios tiene valor 1 y nF se inicia a 10.
 ------------------------------------------------------------------
-Su implementación falla en una prueba en que se hace lo siguiente:
+Su implementaciï¿½n falla en una prueba en que se hace lo siguiente:
 - Llama a 'FiltRec' sobre una imagen de 5x5 elementos, con un
 filtro que sustituye cada elemento por el doble de su valor menos el
 doble del valor de los situados a su izquierda y a su derecha.
-La dupla de actualización decrementa levemente los valores del filtro,
-el parámetro NCambios tiene valor 1 y nF se inicia a 10.
+La dupla de actualizaciï¿½n decrementa levemente los valores del filtro,
+el parï¿½metro NCambios tiene valor 1 y nF se inicia a 10.
 ------------------------------------------------------------------
-Su implementación falla en una prueba en que se hace lo siguiente:
+Su implementaciï¿½n falla en una prueba en que se hace lo siguiente:
 - Llama a 'FiltRec' sobre una imagen de 4x8 elementos, con un
-filtro que sustituye cada elemento por la media de los que están
-situados en los cuatro vértices de la submatriz que lo rodea.
-La dupla de actualización incrementa y cambia el signo a los
-valores del filtro, el parámetro NCambios tiene valor 1 y
+filtro que sustituye cada elemento por la media de los que estï¿½n
+situados en los cuatro vï¿½rtices de la submatriz que lo rodea.
+La dupla de actualizaciï¿½n incrementa y cambia el signo a los
+valores del filtro, el parï¿½metro NCambios tiene valor 1 y
 nF se inicia a 10.
 Los registros parten de valores distintos de cero.
 ------------------------------------------------------------------
-Su implementación falla en una prueba en que se hace lo siguiente:
+Su implementaciï¿½n falla en una prueba en que se hace lo siguiente:
 - Llama a 'FiltRec' sobre una imagen de 4x8 elementos, con un
-filtro que sustituye cada elemento por la media de los que están
-situados en los cuatro vértices de la submatriz que lo rodea.
-La dupla de actualización incrementa y cambia el signo a los
-valores del filtro, el parámetro NCambios tiene valor 0 y
+filtro que sustituye cada elemento por la media de los que estï¿½n
+situados en los cuatro vï¿½rtices de la submatriz que lo rodea.
+La dupla de actualizaciï¿½n incrementa y cambia el signo a los
+valores del filtro, el parï¿½metro NCambios tiene valor 0 y
 nF se inicia a 0.
 Los registros parten de valores distintos de cero.
 ------------------------------------------------------------------
-Su implementación falla en una prueba en que se hace lo siguiente:
+Su implementaciï¿½n falla en una prueba en que se hace lo siguiente:
 - Llama a 'FiltRec' sobre una imagen de 4x8 elementos, con un
-filtro que sustituye cada elemento por la media de los que están
-situados en los cuatro vértices de la submatriz que lo rodea.
-La dupla de actualización incrementa y cambia el signo a los
-valores del filtro, el parámetro NCambios tiene valor 0 y
+filtro que sustituye cada elemento por la media de los que estï¿½n
+situados en los cuatro vï¿½rtices de la submatriz que lo rodea.
+La dupla de actualizaciï¿½n incrementa y cambia el signo a los
+valores del filtro, el parï¿½metro NCambios tiene valor 0 y
 nF se inicia a 2.
 Los registros parten de valores distintos de cero.
 ------------------------------------------------------------------
-Su implementación falla en una prueba en que se hace lo siguiente:
-- Depuración: Utiliza las subrutinas auxiliares del DATSI
-Llama a 'FilPixel', pasándole una imagen de 5x5 elementos y un filtro
-identidad que se aplica a un elemento del interior de la imagen.
-------------------------------------------------------------------
-Su implementación falla en una prueba en que se hace lo siguiente:
-- Depuración: Utiliza las subrutinas auxiliares del DATSI
-Llama a 'FilPixel', pasándole una imagen de 4x8 elementos y un filtro
-que cambia el signo del elemento al que se aplica y le suma el valor
-del elemento situado en la misma columna y en la fila anterior.
-------------------------------------------------------------------
-Su implementación falla en una prueba en que se hace lo siguiente:
-- Depuración: Utiliza las subrutinas auxiliares del DATSI
-Llama a 'FilPixel', pasándole una imagen de 4x8 elementos y un filtro
-que duplica el valor del elemento sobre el que se aplica y le resta
-el valor del situado a su izquierda.
-------------------------------------------------------------------
-Su implementación falla en una prueba en que se hace lo siguiente:
-- Depuración: Utiliza las subrutinas auxiliares del DATSI
-Llama a 'Filtro' pasándole una imagen no nula de 4x8 elementos y
+Su implementaciï¿½n falla en una prueba en que se hace lo siguiente:
+- Depuraciï¿½n: Utiliza las subrutinas auxiliares del DATSI
+Llama a 'Filtro' pasï¿½ndole una imagen no nula de 4x8 elementos y
 un filtro que multiplica por 4 cada elemento y le resta tres veces el
 valor del situado en la misma columna de la fila anterior.
-Algunos elementos alcanzan el valor máximo y otros el mínimo.
+Algunos elementos alcanzan el valor mï¿½ximo y otros el mï¿½nimo.
 ------------------------------------------------------------------
-Su implementación falla en una prueba en que se hace lo siguiente:
-- Depuración: Utiliza las subrutinas auxiliares del DATSI
-Llama a 'Filtro' pasándole una imagen no nula de 4x5 elementos y
+Su implementaciï¿½n falla en una prueba en que se hace lo siguiente:
+- Depuraciï¿½n: Utiliza las subrutinas auxiliares del DATSI
+Llama a 'Filtro' pasï¿½ndole una imagen no nula de 4x5 elementos y
 un filtro que multiplica por 4 cada elemento y le resta tres veces el
 valor del situado en la misma columna de la fila anterior.
 Los registros parten de valores distintos de 0 y algunos elementos
-alcanzan el valor máximo o el mínimo.
+alcanzan el valor mï¿½ximo o el mï¿½nimo.
 ------------------------------------------------------------------
-Su implementación falla en una prueba en que se hace lo siguiente:
-- Depuración: Utiliza las subrutinas auxiliares del DATSI
+Su implementaciï¿½n falla en una prueba en que se hace lo siguiente:
+- Depuraciï¿½n: Utiliza las subrutinas auxiliares del DATSI
 Llama a 'FiltRec' sobre una imagen de 4x4 elementos, con un
-filtro que devuelve para cada píxel la media de los que lo
+filtro que devuelve para cada pï¿½xel la media de los que lo
 rodean.
-La dupla de actualización no modifica el filtro, el parámetro
+La dupla de actualizaciï¿½n no modifica el filtro, el parï¿½metro
 NCambios tiene valor 40 y NFiltrados se inicia a 4.
 ------------------------------------------------------------------
-Su implementación falla en una prueba en que se hace lo siguiente:
-- Depuración: Utiliza las subrutinas auxiliares del DATSI
+Su implementaciï¿½n falla en una prueba en que se hace lo siguiente:
+- Depuraciï¿½n: Utiliza las subrutinas auxiliares del DATSI
 Llama a 'FiltRec' sobre una imagen de 4x4 elementos, con un
 filtro formado por coeficientes distintos de "1" que devuelve para
-cada píxel la media de los que lo rodean.
-La dupla de actualización no modifica el filtro, el parámetro
+cada pï¿½xel la media de los que lo rodean.
+La dupla de actualizaciï¿½n no modifica el filtro, el parï¿½metro
 NCambios tiene valor 0 y NFiltrados se inicia a 4.
 ------------------------------------------------------------------
-Su implementación falla en una prueba en que se hace lo siguiente:
-- Depuración: Utiliza las subrutinas auxiliares del DATSI
+Su implementaciï¿½n falla en una prueba en que se hace lo siguiente:
+- Depuraciï¿½n: Utiliza las subrutinas auxiliares del DATSI
 Llama a 'FiltRec' sobre una imagen de 5x5 elementos, con un
 filtro que sustituye cada elemento por el doble de su valor menos el
 doble del valor de los situados a su izquierda y a su derecha.
-La dupla de actualización decrementa levemente los valores del filtro,
-el parámetro NCambios tiene valor 1 y NFiltrados se inicia a 10.
+La dupla de actualizaciï¿½n decrementa levemente los valores del filtro,
+el parï¿½metro NCambios tiene valor 1 y NFiltrados se inicia a 10.
 ---------------------------------
 	Casos de prueba:       93
-	Pasados: 15
-	Con error: 78
+	Pasados: 41
+	Con error: 52
 	(Error mem): 0
-Nº de pruebas que falla por subrutina: 
+Nï¿½ de pruebas que falla por subrutina: 
 Subr nFiltrados 0 de 10
-Subr ActualizaFiltro 10 de 10
-Subr Comp 6 de 10
-Subr SubMatriz 10 de 10
-Subr ValorPixel 9 de 10
-Subr FilPixel 10 de 10
+Subr ActualizaFiltro 0 de 10
+Subr Comp 7 de 10
+Subr SubMatriz 4 de 10
+Subr ValorPixel 2 de 10
+Subr FilPixel 9 de 10
 Subr Filtro 10 de 10
 Subr FiltRec 15 de 15
 Subr FRdeb 3 de 3
 Subr FIdeb 2 de 2
-Subr FPdeb 3 de 3
-Fecha: 12/11/18     21:09
+Subr FPdeb 0 de 3
+Fecha: 26/11/18     21:08

@@ -33,22 +33,72 @@ nF: data 6
 org 1000
 ;Pruebas Comp:
 
-Imagen1_data: data 3, 3
-  	data	1, 1, 1
-	data	1, 1, 1
-  	data	1, 1, 1
+;
+;Llama a 'Comp', pasándole dos imágenes identicas de 3x3 elementos.
+;
+Imagen1_data1: data 3, 3
+  	data	0x01010101
+	data	0x00010101
+	data	0x0101FFFF
 
-Imagen2_data: data 3, 3
-  	data	1, 1, 1
-  	data	1, 1, 1
-  	data	1, 1, 1
+Imagen2_data1: data 3, 3
+  	data	0x01010101
+  	data	0x00010101
+  	data	0x0101FFFF
+;
+;Llama a 'Comp', pasándole dos imágenes de 4x8 elementos que difieren en uno solo de ellos.
+;
+
+Imagen1_data2: data 4, 8
+	data	0x00000000
+	data	0x00000000
+	data	0x01000000
+	data	0x00000000
+	data	0x00000000
+	data	0x00000000
+	data	0x00000000
+	data	0x00000000
+
+Imagen2_data2: data 4, 8
+	data	0x00000000
+	data	0x00000000
+	data	0x02000000
+	data	0x00000000
+	data	0x00000000
+	data	0x00000000
+	data	0x00000000
+	data	0x00000000
+
+;
+;Llama a Comp, pasándole dos imágenes diferentes de 4x8 elementos.
+;
+
+;
+;Llama a 'Comp', pasándole dos imágenes de 4x8 elementos en las que difieren todos sus elementos en una o en dos
+;unidades.
+;
+
+;
+;Llama a 'Comp', pasándole dos imágenes de 8x8 elementos en las que todos sus elementos difieren en +/-1.
+;
+
+;
+;Llama a 'Comp', pasándole dos imágenes de 8x8 elementos en las que todos sus elementos difieren en +/-1.
+;(Los registros parten de valores distintos de 0.)
+;
+
+;
+;Llama a 'Comp', pasándole dos imágenes de 4x5 elementos en las que difieren varios de ellos.
+;
+
+
 
 ;Pruebas ActualizaFiltro:
 
 Mfiltro_data:
-  	data	1, 1, 1
-  	data	1, 0, 1
-  	data	1, 1, 1
+  	data	3, 4, 8
+  	data	5, 6, 2
+  	data	1, 0, 3
 
 Modfiltro_data: data 0, 0 		; Dupla
 
@@ -65,15 +115,16 @@ SubImg_data: ;data  3
   	data	1, 0, 1
   	data	1, 1, 1
 
-SubImg_res: res 12						; Reserva de espacio para almacenar SubImg
+;SubImg_res: res 12						; Reserva de espacio para almacenar SubImg
 
 ImFiltrada:
 	data 0, 0
 	data 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF
+
 org 0x2000
 IMAGEN:
 	data 3, 3
-	data 0x04030201, 0x08070605, 0x09
+	data 0x02030407, 0x01090805, 0x06
 
 org 0x2040
 SUBIMAGEN:
@@ -113,16 +164,16 @@ PPAL:
 	jmp		(r1)
 
 PPALSubMatriz:
-  	LEA		(r30,60000)					; Inicializacion del puntero de pila
-	LEA		(r2,IMAGEN)			 		; carga Matriz imagen
-	PUSH	(r2)
-	LEA		(r2,SUBIMAGEN)				; carga direccion de SubImg
-	PUSH	(r2)
+  	LEA		(r30,60000)					; Inicializacion del puntero de pila	
 	or 		r2, r0, 1
-	PUSH	(r2) 						; i=1
+	PUSH	(r2) 						; j=1
   	or 		r2, r0, 1
-	PUSH	(r2)						; j=1
-  	bsr 	SubMatriz
+	PUSH	(r2)						; i=1
+	LEA		(r2,SUBIMAGEN)				; carga direccion de SubImg
+	PUSH	(r2)						
+  	LEA		(r2,IMAGEN)			 		; carga Matriz imagen
+	PUSH	(r2)
+	bsr 	SubMatriz
   	stop
 
 PPALnFiltrados:
@@ -166,9 +217,9 @@ PPALnFiltrados:
 
 PPALComp:
 	LEA		(r30, 60000)
-	LEA		(r2, Imagen1_data)
+	LEA		(r2, Imagen1_data2)
 	PUSH	(r2)
-	LEA		(r2, Imagen2_data)
+	LEA		(r2, Imagen2_data2)
 	PUSH	(r2)
 	bsr		Comp
 	stop
@@ -186,8 +237,9 @@ PPALVPixel:
   LEA	(r30, 60000) 					; Inicializacion del puntero de pila
   LEA	(r10, SubImg_data)				; carga de los datos
   LEA	(r11, Mfiltro_data)				; de pruebas
-  PUSH	(r10)
-  PUSH	(r11)
+  PUSH	(r10)							; Cargo SubImg
+  PUSH	(r11)							; Cargo MFiltro
+  bsr	ValorPixel
   stop
 
 ;
@@ -237,10 +289,11 @@ Comp:									; Comp (Img1, Img2)
 	ld		r6, r30, 8					; dir Im2
 	ld		r11, r4, 0					; r11 <- M1
 	ld		r8, r4, 4					; r8 <- N1
+	mulu	r8, r11, r8					; r8 <- elementos a comparar
 	ld		r12, r6, 0					; r12 <- M2
 	ld		r10, r6, 4					; r10 <- N2
-	addu	r4, r4, 8					;	r4 <- dir primer elemento Im1
-	addu	r6, r6, 8					;	r6 <- dir primer elemento Im2
+	addu	r4, r4, 8					; r4 <- dir primer elemento Im1
+	addu	r6, r6, 8					; r6 <- dir primer elemento Im2
 	addu	r16, r0, r0					; Contador con elementos comparados
 
 COMPARA:
@@ -324,10 +377,10 @@ SubMatriz: 								; SubMatriz (Img, SubImg, i, j)
 	bb1		eq, r7, SM_EXTR
 
 SM_N_EXTR:
-	addu	r18, r0, 3					; fila
+	addu	r18, r0, 3					; var fila = 3
 BUC_FIL_SM:
-	addu	r19, r0, 3					; col
-	subu	r18, r18, 1
+	addu	r19, r0, 3					; var col = 3
+	subu	r18, r18, 1					; fila = fila - 1
 	cmp		r3, r18, r0
 	bb1		lt, r3, SM_FIN
 BUC_COL_SM:
@@ -338,9 +391,7 @@ BUC_COL_SM:
 	subu	r19, r19, 1
 	cmp		r5, r19, r0
 	bb1		gt, r5, BUC_COL_SM
-	;Cambio de fila:
-	addu	r21, r17, 0					; puntero a primer elemento de siguiente fila
-	br		BUC_FIL_SM
+	br		BUC_FIL_SM					;Cambio de fila:
 
 SM_EXTR:								; Bucle para copiar elemento en SubImg (dato en borde)
 	st.b	r14, r6, 0					; Copiamos el elemento central en el primer hueco de SubImg
@@ -463,15 +514,15 @@ FILTRO_BUC_I:
 	ld		r2, r31, -20				; i
 	ld		r4, r31, -12				; M-1
 	cmp		r3, r2, r4
-	bb1		lt, r3, FILTRO_BUC_J
+	bb1		gt, r3, FILTRO_FIN
 	addu	r2, r0, r0
 	br		FILTRO_BUC_J
 FILTRO_BUC_J:
-	ld		r2, r31, -20				; i (lo puedo haber perdido)
 	ld		r6, r31, -16				; j
 	ld		r8, r31, -8					; N-1
 	cmp		r5, r6, r8
 	bb1		gt, r5, FILTRO_CAMB_I
+	ld		r2, r31, -20				; i (lo puedo haber perdido)
 	ld		r10, r31, 16				; MFiltro
 	ld		r12, r31, 8					; dir Img
 	PUSH	(r10)
@@ -482,13 +533,12 @@ FILTRO_BUC_J:
 
 	subu	r30, r30, 16				; "Borrado" de PUSHes	
 	ld		r4, r31, 12					; ImFilt
-	addu	r4, r4, 8					; Primer dato ImFilt
 	ld		r2, r31, -20				; i
 	ld		r6, r31, -16				; j
-	ld		r8, r31, -12				; M-1
-	ld		r9, r31, -8					; N-1
+	ld		r8, r4, 4					; N
+	addu	r4, r4, 8					; Primer dato ImFilt
 	addu	r10, r0, r4					; Primer dato ImFilt (copia)
-	mulu	r11, r2, r9					; i*(M-1)
+	mulu	r11, r2, r8					; i*N
 	addu	r10, r10, r11				; Fila deseada
 	addu	r10, r10, r6				; Dato deseado
 	st.b	r29, r10, r0				; Guardo valor Filtrado en ImFilt
@@ -498,10 +548,9 @@ FILTRO_BUC_J:
 FILTRO_CAMB_I:
 	ld		r2, r31, -20				; i
 	ld		r4, r31, -8					; M-1
-	cmp		r5, r2, r4
-	bb1		eq, r5, FILTRO_FIN			; Si i=M-1, FIN
 	addu	r2, r2, 1					; i = i+1
 	st		r2, r31, -20				; Actualizo i en pila
+	st		r0, r31, -16				; j = 0 para la nueva fila	
 	br		FILTRO_BUC_I
 FILTRO_FIN:
 	or		r30, r31, r31
@@ -509,5 +558,64 @@ FILTRO_FIN:
 	POP		(r1)
 	jmp		(r1)
 
-FiltRec:
+FiltRec:								; FiltRec (ImgIn, ImgOut, MFiltro, ModFiltro, NCambios)
+	PUSH	(r1)
+	PUSH	(r31)
+	or		r31, r30, r30
+	
+	; Reserva de (4+4+M*N)*4 palabras para ImgTmp:
+	ld		r2, r31, 8					; dir ImgIn
+	ld		r4, r2, 0					; M
+	ld		r6, r2, 4					; N
+	mulu	r8, r4, r6					; M*N
+	addu	r8, r8, 8					; (4+4+M*N)
+	mulu	r8, r8, 4					; (4+4+M*N)*4 <-> nº palabras
+	subu	r30, r30, r8				; Reserva de las palabras
+	st		r30, r31, -4				; Guardo dirección de ImgTmp
+
+	; Llamada a Filtro (ImgIn, ImgOut, MFiltro):
+	ld		r2, r31, 16					; MFiltro
+	ld		r4, r31, 12					; ImgOut
+	ld		r6, r31, 8					; ImgIn
+	PUSH	(r2)
+	PUSH	(r4)
+	PUSH	(r6)
+	bsr		Filtro
+	addu	r30, r30, 12				; "Borrado" de PUSHes
+	
+	; Llamada a ActualizaFiltro (MFiltro, ModFiltro):
+	ld		r2, r31, 20					; ModFiltro
+	ld		r4, r31, 16					; MFiltro
+	PUSH	(r2)
+	PUSH	(r4)
+	bsr		ActualizaFiltro
+	addu	r30, r30, 8					; "Borrado" de PUSHes
+
+	; Copia de ImgOut a ImgTmp:
+	ld		r2, r31, -4					; ImgTmp
+	ld		r4, r31, 12					; ImgOut
+	PUSH	(r2)
+	PUSH	(r4)
+	bsr		FR_COPIA_IMG
+	addu	r30, r30, 8					; "Borrado" de PUSHes
+
+	; Llamada a nFiltrados (oper):
+	subu	r2, r0, 1					; oper
+	PUSH	(r2)
+	bsr		nFiltrados
+	addu	r30, r30, 4					; "Borrado" de PUSH
+
+	; Comprobación del resultado de nFiltrados con NCambios:
+	cmp		r3, r29, r0
+	bb1		ne, r3, FR_RES_NZ
+	subu	r29, r0, 1
+	br 		FR_FIN
+
+	; PASO 6:
+FR_RES_NZ:
+
+FR_FIN:
+	or		r30, r31, r31
+	POP		(r31)
+	POP		(r1)
 	jmp		(r1)

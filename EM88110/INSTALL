@@ -1,0 +1,84 @@
+#!/bin/sh
+ROOT=/usr/local/88k
+BIN_DIR=/usr/bin
+FILES="em88110 88110e 88110ins serie paralelo"
+
+    usuario="`whoami`"
+
+    echo "Introduzca el directorio donde se va a instalar el emulador"
+    echo -n "(por defecto $ROOT) "
+    read aux 
+    if [ "Y"$aux != "Y" ]; then
+	ROOT=$aux
+    fi
+
+    echo 
+    echo "El directorio donde se van a instalar los ejecutables debe formar"
+    echo "parte de la variable PATH. Introduzca el directorio donde se van a"
+    echo -n "instalar los ejecutables (por defecto $BIN_DIR) "
+    read aux 
+
+    if [ "Y"$aux != "Y" ]; then
+	BIN_DIR=$aux
+    fi
+
+    echo
+    echo "El directorio de instalacion es $ROOT"
+    echo "El directorio de los ejecutables es $BIN_DIR"
+    echo -n "Si los parametros son correctos pulse enter "
+    read aux 
+
+    if [ "Y"$aux != "Y" ]; then
+	echo "Instalacion cancelada"
+	exit 1
+    fi
+
+    
+
+    if test -d $ROOT
+    then
+	echo "El directorio $ROOT existe. Se ignora"
+    else
+	mkdir $ROOT
+	if [ $? != 0 ]; then
+		echo "Error al crear ${ROOT}. Instalacion cancelada."
+		exit 1
+	fi
+	chmod 755 $ROOT
+    fi
+
+    if test -d $BIN_DIR
+    then
+	echo "El directorio $ROOT existe. Se ignora"
+    else
+	mkdir $BIN_DIR
+	if [ $? != 0 ]; then
+		echo "Error al crear ${BIN_DIR}. Instalacion cancelada."
+		exit 1
+	fi
+	chmod 755 $BIN_DIR
+    fi
+
+
+    umask 22
+    for i in $FILES
+    do
+    	cp $i $ROOT
+    	chmod a+rx $ROOT/$i
+	if [ $usuario = "root" ]; then
+    		chown root $ROOT/$i
+	fi
+    done
+		
+    rm -f mc88110
+cat >./mc88110<<EOFmc88110
+#!/bin/sh
+exec $ROOT/em88110 -c $ROOT/serie \$*
+EOFmc88110
+
+    cp mc88110 $BIN_DIR
+    ln -s $ROOT/88110e $BIN_DIR
+    chmod a+rx $BIN_DIR/mc88110
+    rm -f mc88110
+    exit 0
+

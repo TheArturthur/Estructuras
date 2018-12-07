@@ -28,7 +28,7 @@ ENDMACRO
 ;
 ;Pruebas nFiltrados:
 org 0
-nF: data 6
+nF: data 3
 
 org 1000
 ;Pruebas Comp:
@@ -94,13 +94,13 @@ Imagen2_data2: data 4, 8
 
 
 ;Pruebas ActualizaFiltro:
-
+org 0x3000
 Mfiltro_data:
-  	data	3, 4, 8
-  	data	5, 6, 2
-  	data	1, 0, 3
+  	data	1, 1, 1
+  	data	1, 0, 1
+  	data	1, 1, 1
 
-Modfiltro_data: data 0, 0 		; Dupla
+Modfiltro_data: data 4, 2 		; Dupla
 
 ;Pruebas SubMatriz:
 
@@ -116,15 +116,16 @@ SubImg_data: ;data  3
   	data	1, 1, 1
 
 ;SubImg_res: res 12						; Reserva de espacio para almacenar SubImg
-
-ImFiltrada:
-	data 0, 0
-	data 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF
-
-org 0x2000
+org 0x8100
+ImFiltrada: res 40
+	
+org 0x8000
 IMAGEN:
-	data 3, 3
-	data 0x02030407, 0x01090805, 0x06
+	data 4, 8
+	data 0xFF0201FF, 0xFF0403FF
+    data 0xFF0605FF, 0xFF0807FF
+    data 0xFF0605FF, 0xFF0807FF
+    data 0xFF0201FF, 0xFF0403FF
 
 org 0x2040
 SUBIMAGEN:
@@ -157,7 +158,21 @@ PPALFilPixel:
 	stop
 
 ;Pruebas FiltRec:
-
+PPALFiltRec:
+	LEA		(r30, 60000)
+	LEA		(r2, IMAGEN)
+	LEA		(r4, Mfiltro_data)
+	LEA		(r6, Modfiltro_data)
+	LEA		(r8, ImFiltrada)
+	or		r10, r0, r0
+	PUSH	(r10)
+	PUSH	(r6)
+	PUSH	(r4)
+	PUSH	(r8)
+	PUSH	(r2)
+	bsr		FiltRec
+	stop
+	
 org 0x10000
 
 PPAL:
@@ -330,10 +345,10 @@ ActualizaFiltro:						; ActualizaFiltro (MFiltro, ModFiltro)
 	addu	r11, r0, r0					; Contador
 
 BUC_ACTF:
-	ld	r12, r2, r11					; r12 <- dato Matriz
+	ld		r12, r2, r11					; r12 <- dato Matriz
 	muls	r13, r12, r6				; r13 <- dato * numerador
 	divs	r14, r13, r8				; r14 <- dato * numerador / denominador
-	st	r14, r2, r11					; r14 -> posicion en matriz
+	st		r14, r2, r11					; r14 -> posicion en matriz
 	addu	r11, r11, 4					; contador = contador + 1
 	cmp		r5, r11, 32
 	; Si faltan datos en la matriz por actualizar, repite con el siguiente:
@@ -570,8 +585,11 @@ FiltRec:								; FiltRec (ImgIn, ImgOut, MFiltro, ModFiltro, NCambios)
 	mulu	r8, r4, r6					; M*N
 	addu	r8, r8, 8					; (4+4+M*N)
 	mulu	r8, r8, 4					; (4+4+M*N)*4 <-> nº palabras
+	subu	r30, r30, 8					; Reservo 1 palabra para la dir de ImgTmp
 	subu	r30, r30, r8				; Reserva de las palabras
 	st		r30, r31, -4				; Guardo dirección de ImgTmp
+	ld		r4, r31, 12					; ImgOut
+	st		r4, r31, -8					; Guardo dir ImgOut
 
 	; Llamada a Filtro (ImgIn, ImgOut, MFiltro):
 	ld		r2, r31, 16					; MFiltro
@@ -591,12 +609,12 @@ FiltRec:								; FiltRec (ImgIn, ImgOut, MFiltro, ModFiltro, NCambios)
 	bsr		ActualizaFiltro
 	addu	r30, r30, 8					; "Borrado" de PUSHes
 
-	; Copia de ImgOut a ImgTmp:
+	; Copia de ImgOut a ImgTmp. Llamada a COPIA_IMG_BYTE (ImgOut, ImgTmp):
 	ld		r2, r31, -4					; ImgTmp
 	ld		r4, r31, 12					; ImgOut
 	PUSH	(r2)
 	PUSH	(r4)
-	bsr		FR_COPIA_IMG
+	bsr		FR_COPIA_IMG_BYTE
 	addu	r30, r30, 8					; "Borrado" de PUSHes
 
 	; Llamada a nFiltrados (oper):
@@ -605,17 +623,74 @@ FiltRec:								; FiltRec (ImgIn, ImgOut, MFiltro, ModFiltro, NCambios)
 	bsr		nFiltrados
 	addu	r30, r30, 4					; "Borrado" de PUSH
 
-	; Comprobación del resultado de nFiltrados con NCambios:
+	; Comprobación del resultado de nFiltrados: r29==0 => r29=-1, FIN:
 	cmp		r3, r29, r0
 	bb1		ne, r3, FR_RES_NZ
 	subu	r29, r0, 1
 	br 		FR_FIN
 
-	; PASO 6:
 FR_RES_NZ:
+	; Llamada a Comp (Img1, Img2):
+	ld		r2, r31, 12					; ImgOut
+	ld		r4, r31, 8					; ImgIn
+	PUSH	(r2)
+	PUSH	(r4)
+	bsr		Comp
+	addu	r30, r30, 8					; "Borrado" de PUSHes
 
+	; Comprobación del resultado de Comp: r29<NCambios => FIN
+	ld		r2, r31, 24					; NCambios
+	cmp		r3, r29, r2
+	bb1		lt, r3, FR_FIN
+
+	; Llamada recursiva a FiltRec (ImgIn, ImgTmp, MFiltro, ModFiltro, NCambios):
+	ld		r2, r31, 24					; NCambios
+	ld		r4, r31, 20					; ModFiltro
+	ld		r6, r31, 16					; MFiltro
+	ld		r8, r31, -4					; ImgTmp
+	ld		r10, r31, 8					; ImgIn
+	PUSH	(r2)
+	PUSH	(r4)
+	PUSH	(r6)
+	PUSH	(r8)
+	PUSH	(r10)
+	bsr		FiltRec
+	addu	r30, r30, 20				; "Borrado" de PUSHes
+
+	;FIN:
 FR_FIN:
+	; Copio la última imagen filtrada en ImgOut:
+	ld		r2, r31, -4					; ImgTmp
+	ld		r4, r31, -8					; ImgOut
+	PUSH	(r2)
+	PUSH	(r4)
+	bsr		FR_COPIA_IMG_BYTE
 	or		r30, r31, r31
 	POP		(r31)
+	POP		(r1)
+	jmp		(r1)
+
+FR_COPIA_IMG_BYTE:						; Copia Img1 en Img2
+	PUSH	(r1)
+	ld		r2, r30, 4					; dir Img1
+	ld		r4, r30, 8					; dir Img2
+	ld		r6, r2, 0					; M
+	ld		r8, r2, 4					; N
+	mulu	r10, r6, r8					; M*N (Nº elementos)
+	addu	r11, r0, r0					; Contador
+	; Guarda M y N en M' y N':
+	st		r6, r4, 0					; M'
+	st		r8, r4, 4					; N'
+	; Punteros para recorrer Img1 e Img2
+	addu	r6, r2, 8					; Puntero a primer elemento de Img1
+	addu	r8, r4, 8					; Puntero a primer hueco de Img2
+BUC_FR_COPIA_IMG_BYTE:
+	ld.b	r12, r6, 0					; Valor del elemento de Img1 a copiar
+	st.b	r12, r8, 0					; Guardo elemento en hueco correspondiente
+	addu	r11, r11, 1					; Contador = Contador + 1
+	addu	r6, r6, 1					; Actualizo puntero Img1
+	addu	r8, r8, 1					; Actualizo puntero Img2
+	cmp		r3, r11, r10
+	bb1		lt, r3, BUC_FR_COPIA_IMG_BYTE
 	POP		(r1)
 	jmp		(r1)

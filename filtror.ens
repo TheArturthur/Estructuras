@@ -96,11 +96,10 @@ Imagen2_data2: data 4, 8
 ;Pruebas ActualizaFiltro:
 ;Pruebas SubMatriz:
 
-Imagen_data2: data 3,5
-  	data	0x04030201
-  	data	0x05030505
-  	data	0x03010503
-  	data	0x00090705
+Imagen_data2: data 3,3
+  	data	0xFF0201FF
+  	data	0x05FF0605
+  	data	0x06
 
 SubImg_data: ;data  3
 	data	0xFFFFFFFF
@@ -110,7 +109,7 @@ SubImg_data: ;data  3
 ;SubImg_res: res 12						; Reserva de espacio para almacenar SubImg
 
 	
-org 0x8000
+org 0x80000
 IMAGEN:
 	data 4, 8
 	data 0xFF0201FF, 0xFF0403FF
@@ -125,7 +124,7 @@ Mfiltro_data:
   	data	1, 0, 1
   	data	1, 1, 1
 
-org 0x8100
+org 0x81000
 ImFiltrada: res 40
 	;data 0xAAAAAAAAA, 0xAAAAAAAA
 
@@ -149,14 +148,15 @@ PPALFiltro:
 PPALFilPixel:
 	LEA		(r30, 60000)
 	LEA		(r2, Mfiltro_data)
-	or		r4, r0, 0					; j=1
-	or		r6, r0, 0					; i=1
-	LEA		(r8, IMAGEN)
+	or		r4, r0, 1					; j=1
+	or		r6, r0, 1					; i=1
+	LEA		(r8, Imagen_data2)
 	PUSH	(r2)
 	PUSH	(r4)
 	PUSH	(r6)
 	PUSH	(r8)
 	bsr		FilPixel
+	addu	r30, r30, 16
 	stop
 
 ;Pruebas FiltRec:
@@ -173,6 +173,7 @@ PPALFiltRec:
 	PUSH	(r8)
 	PUSH	(r2)
 	bsr		FiltRec
+	addu	r30, r30, 20
 	stop
 	
 org 0x10000
@@ -191,6 +192,7 @@ PPALSubMatriz:
   	LEA		(r2,IMAGEN)			 		; carga Matriz imagen
 	PUSH	(r2)
 	bsr 	SubMatriz
+	addu	r30, r30, 16
   	stop
 
 PPALnFiltrados:
@@ -198,21 +200,27 @@ PPALnFiltrados:
   	add		r5, r0, -5
 	PUSH	(r5)
 	bsr		nFiltrados
+	addu	r30, r30, 4
   	or 		r5, r0, 3					; cargas un valor oper
  	PUSH	(r5)						; lo metes en la pila
   	bsr 	nFiltrados 					; y llamas a nFiltrados
-  	sub 	r5, r0,6
+  	addu	r30, r30, 4
+	sub 	r5, r0,6
   	;or r5,r0,-4 		 				; cargas un valor oper
   	PUSH	(r5)  						; lo metes en la pila
   	bsr 	nFiltrados					; y llamas a nFiltrados
+	addu	r30, r30, 4
   	or 	r5, r0, 1						; .....
   	PUSH	(r5)
   	bsr 	nFiltrados
-  	sub 	r5,r0,2
+  	addu	r30, r30, 4
+	sub 	r5,r0,2
   	PUSH	(r5)
   	bsr 	nFiltrados
-  	PUSH	(r5)
+  	addu	r30, r30, 4
+	PUSH	(r5)
   	bsr 	nFiltrados
+	addu	r30, r30, 4
   	stop
 
 PPALComp:
@@ -222,6 +230,7 @@ PPALComp:
 	LEA		(r2, Imagen2_data2)
 	PUSH	(r2)
 	bsr		Comp
+	addu	r30, r30, 8
 	stop
 
 PPALActFiltro:
@@ -231,6 +240,7 @@ PPALActFiltro:
 	LEA		(r2, Modfiltro_data)		; Cargo Modfiltro_data en r2
 	PUSH	(r2)						; Y lo meto en la pila
 	bsr		ActualizaFiltro
+	addu	r30, r30, 8
 	stop
 
 PPALVPixel:
@@ -240,6 +250,7 @@ PPALVPixel:
   PUSH	(r10)							; Cargo SubImg
   PUSH	(r11)							; Cargo MFiltro
   bsr	ValorPixel
+  addu	r30, r30, 8
   stop
 
 ;
@@ -571,11 +582,9 @@ FiltRec:								; FiltRec (ImgIn, ImgOut, MFiltro, ModFiltro, NCambios)
 	mulu	r8, r4, r6					; M*N
 	addu	r8, r8, 8					; (4+4+M*N)
 	mulu	r8, r8, 4					; (4+4+M*N)*4 <-> nº palabras
-	subu	r30, r30, 8					; Reservo 1 palabra para la dir de ImgTmp
-	subu	r30, r30, r8				; Reserva de las palabras
+	subu	r30, r30, 4					; Reservo 1 palabra para la dir de ImgTmp
+	subu	r30, r30, r8				; Reserva de las palabras de ImgTmp
 	st		r30, r31, -4				; Guardo dirección de ImgTmp
-	ld		r4, r31, 12					; ImgOut
-	st		r4, r31, -8					; Guardo dir ImgOut
 
 	; Llamada a Filtro (ImgIn, ImgOut, MFiltro):
 	ld		r2, r31, 16					; MFiltro
@@ -647,7 +656,7 @@ FR_RES_NZ:
 FR_FIN:
 	; Copio la última imagen filtrada en ImgOut:
 	ld		r2, r31, -4					; ImgTmp
-	ld		r4, r31, -8					; ImgOut
+	ld		r4, r31, 12					; ImgOut
 	PUSH	(r2)
 	PUSH	(r4)
 	bsr		FR_COPIA_IMG_BYTE

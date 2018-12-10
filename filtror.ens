@@ -413,7 +413,7 @@ ValorPixel:								; ValorPixel (SubImg, MFiltro)
 
 BUC_VPixel:
 	ld		r10, r4, 0					; r10 <- dato MFiltro
-	ld.b	r11, r6, 0					; r11 <- dato SubImg
+	ld.bu	r11, r6, 0					; r11 <- dato SubImg
 	muls	r12, r10, r11				; r12 <- dato_SubImg * dato_MFiltro
 	add		r2, r2, r12					; ACC = ACC + r12
 	addu	r4, r4, 4					; Actualiza puntero MFiltro

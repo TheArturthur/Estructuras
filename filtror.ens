@@ -109,7 +109,7 @@ SubImg_data: ;data  3
 ;SubImg_res: res 12						; Reserva de espacio para almacenar SubImg
 
 	
-org 0x80000
+org 0x8000
 IMAGEN:
 	data 4, 8
 	data 0xFF0201FF, 0xFF0403FF
@@ -124,7 +124,7 @@ Mfiltro_data:
   	data	1, 0, 1
   	data	1, 1, 1
 
-org 0x81000
+org 0x8100
 ImFiltrada: res 40
 	;data 0xAAAAAAAAA, 0xAAAAAAAA
 

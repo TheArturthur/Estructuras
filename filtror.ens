@@ -180,7 +180,7 @@ PPALFiltRec:
 	LEA	(r4, Mfiltro_data)
 	LEA	(r6, Modfiltro_data)
 	LEA	(r8, ImFiltrada)
-	or	r10, r0, 40
+	or	r10, r0, r0
 	PUSH	(r10)
 	PUSH	(r6)
 	PUSH	(r4)
@@ -681,12 +681,12 @@ FR_RES_NZ:
 	cmp		r3, r29, r2
 	bb1		lt, r3, FR_FIN
 
-	; Llamada recursiva a FiltRec (ImgIn, ImgTmp, MFiltro, ModFiltro, NCambios):
+	; Llamada a FiltRec' (ImgTmp, ImgOut, MFiltro, ModFiltro, NCambios):
 	ld		r2, r31, 24						; NCambios
 	ld		r4, r31, 20						; ModFiltro
 	ld		r6, r31, 16						; MFiltro
-	ld		r8, r31, -4						; ImgTmp
-	ld		r10, r31, 8						; ImgIn
+	ld		r8, r31, 12						; ImgOut
+	ld		r10, r31, -4					; ImgTmp
 	PUSH	(r2)
 	PUSH	(r4)
 	PUSH	(r6)
@@ -697,19 +697,13 @@ FR_RES_NZ:
 
 	;FIN:
 FR_FIN:
-	; Copio la última imagen filtrada en ImgOut:
-	ld		r2, r31, -4						; ImgTmp
-	ld		r4, r31, 12						; ImgOut
-	PUSH	(r2)
-	PUSH	(r4)
-	bsr	FR_COPIA_IMG_BYTE
 	or	r30, r31, r31
 	POP	(r31)
 	POP	(r1)
 	jmp	(r1)
 
 ;--------------------------------------------------------------------------------------------------------
-
+; SUBRUTINA DE COPIA DE UNA MATRIZ A OTRA A NIVEL DE BYTE
 ;--------------------------------------------------------------------------------------------------------
 
 FR_COPIA_IMG_BYTE:							; Copia Img1 en Img2

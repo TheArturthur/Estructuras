@@ -616,7 +616,7 @@ FILTRO_FIN:
 FiltRec:									; FiltRec (ImgIn, ImgOut, MFiltro, ModFiltro, NCambios)
 	PUSH	(r1)
 	PUSH	(r31)
-	or	r31, r30, r30
+	or		r31, r30, r30
 	
 	; Reserva de (4+4+M*N)*4 palabras para ImgTmp:
 	ld		r2, r31, 8						; dir ImgIn

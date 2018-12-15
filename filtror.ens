@@ -113,13 +113,10 @@ SubImg_data: ;data  3
 	
 org 0x20000
 IMAGEN:
-	data 4, 8
-	data 0xFF0201FF, 0xFF0403FF
-	data 0xFF0605FF, 0xFF0807FF
-	data 0xFF0605FF, 0xFF0807FF
-	data 0xFF0201FF, 0xFF0403FF
+	data 4, 4
+	data 0x04030201, 0x0D0E0F10, 0x05040302, 0x23222120
 
-Modfiltro_data: data 4, 2 						; Dupla
+Modfiltro_data: data 1, 1 						; Dupla
 
 Mfiltro_data:
   	data	1, 1, 1
@@ -127,8 +124,8 @@ Mfiltro_data:
   	data	1, 1, 1
 
 org 0x20100
-ImFiltrada: res 40
-	;data 0xAAAAAAAAA, 0xAAAAAAAA
+ImFiltrada: res 24
+	data 0xAAAAAAAAA, 0xAAAAAAAA
 
 org 0x20200
 SUBIMAGEN:
@@ -162,8 +159,8 @@ PPALFiltro:
 PPALFilPixel:
 	LEA		(r30, 60000)
 	LEA		(r2, Mfiltro_data)
-	or		r4, r0, 3						; j=3
-	or		r6, r0, 1						; i=1
+	or		r4, r0, 1						; j=1
+	or		r6, r0, 2						; i=2
 	LEA		(r8, IMAGEN)
 	PUSH	(r2)
 	PUSH	(r4)
@@ -180,7 +177,7 @@ PPALFiltRec:
 	LEA	(r4, Mfiltro_data)
 	LEA	(r6, Modfiltro_data)
 	LEA	(r8, ImFiltrada)
-	or	r10, r0, r0
+	or	r10, r0, 40
 	PUSH	(r10)
 	PUSH	(r6)
 	PUSH	(r4)
@@ -393,6 +390,7 @@ SubMatriz: 									; SubMatriz (Img, SubImg, i, j)
 	subu	r16, r9, 1						; M-1
 	subu	r17, r10, 1						; N-1
 	addu	r22, r0, 9						; Contador para los 9 elementos
+	
 	cmp		r3, r15, 0
 	;Si i*j=0 => i=0 y/o j=0 => elemento en borde
 	bb1	eq, r3, SM_EXTR
@@ -408,18 +406,20 @@ SubMatriz: 									; SubMatriz (Img, SubImg, i, j)
 SM_N_EXTR:
 	; Apunto el puntero al primer dato a copiar respecto del dato central (i-1,j-1) y le hago una copia
 	subu	r4, r4, 1						; i-1
-	mulu	r11, r4, r17					; (i-1)*(N-1). Fila anterior a la del dato central
-	addu	r11, r11, r2					; (i-1)*(N-1)+(j). Elemento inmediatamente superior al dato central
-	subu	r11, r11, 1						; (i-1)*(N-1)+(j-1). Primer elemento a copiar
+	mulu	r11, r4, r10					; (i-1)*(N). Fila anterior a la del dato central
+	addu	r11, r11, r2					; (i-1)*(N)+(j). Elemento inmediatamente superior al dato central
+	subu	r11, r11, 1						; (i-1)*(N)+(j-1). Primer elemento a copiar
 	addu	r12, r12, r11					; r12 apuntando al primer elemento de la matriz de 3x3 a copiar
 	or		r21, r12, r0					; copia del puntero para cambio de fila
 	
 	addu	r18, r0, 3						; var fila = 3
+
 BUC_FIL_SM:
 	addu	r19, r0, 3						; var col = 3
 	subu	r18, r18, 1						; fila = fila - 1
 	cmp		r3, r18, r0
 	bb1		lt, r3, SM_FIN
+
 BUC_COL_SM:
 	ld.bu	r20, r12, 0						; dato
 	st.b	r20, r6, 0						; dato -> M(r6) (puntero en SubImg)

@@ -115,6 +115,7 @@ org 0x20000
 IMAGEN:
 	data 4, 4
 	data 0x04030201, 0x0D0E0F10, 0x05040302, 0x23222120
+	;data 0x04030201, 0x0D060510, 0x05131202, 0x23222120
 
 Modfiltro_data: data 1, 1 						; Dupla
 
@@ -130,6 +131,11 @@ ImFiltrada: res 24
 org 0x20200
 SUBIMAGEN:
 	data 0x00000000, 0x00000000, 0x00000000
+
+org 0x20300
+IMAGEN_PRIMA:
+	data 4, 4
+	data 0x04030201, 0x0D060510, 0x05131202, 0x23222120
 
 ;----------------------------------------------------
 ; PRUEBAS
@@ -148,11 +154,11 @@ PPALFiltro:
 	LEA		(r30, 36840)
 	LEA		(r2, Mfiltro_data)
 	PUSH	(r2)
-	LEA	(r2, ImFiltrada)
+	LEA		(r2, ImFiltrada)
 	PUSH	(r2)
-	LEA	(r2, IMAGEN)
+	LEA		(r2, IMAGEN)
 	PUSH	(r2)
-	bsr	Filtro
+	bsr		Filtro
 	stop
 	
 ;Pruebas FilPixel:
@@ -172,12 +178,12 @@ PPALFilPixel:
 
 ;Pruebas FiltRec:
 PPALFiltRec:
-	LEA	(r30, 60000)
-	LEA	(r2, IMAGEN)
-	LEA	(r4, Mfiltro_data)
-	LEA	(r6, Modfiltro_data)
-	LEA	(r8, ImFiltrada)
-	or	r10, r0, 40
+	LEA		(r30, 60000)
+	LEA		(r2, IMAGEN)
+	LEA		(r4, Mfiltro_data)
+	LEA		(r6, Modfiltro_data)
+	LEA		(r8, ImFiltrada)
+	or		r10, r0, 40
 	PUSH	(r10)
 	PUSH	(r6)
 	PUSH	(r4)
@@ -216,8 +222,7 @@ PPALnFiltrados:
  	PUSH	(r5)							; lo metes en la pila
   	bsr 	nFiltrados 						; y llamas a nFiltrados
   	addu	r30, r30, 4
-	sub 	r5, r0,6
-  	;or r5,r0,-4 		 					; cargas un valor oper
+	sub 	r5, r0, 6
   	PUSH	(r5)  							; lo metes en la pila
   	bsr 	nFiltrados						; y llamas a nFiltrados
 	addu	r30, r30, 4
@@ -235,10 +240,10 @@ PPALnFiltrados:
   	stop
 
 PPALComp:
-	LEA	(r30, 60000)
-	LEA	(r2, Imagen1_data2)
+	LEA		(r30, 60000)
+	LEA		(r2, IMAGEN_PRIMA)
 	PUSH	(r2)
-	LEA	(r2, Imagen2_data2)
+	LEA		(r2, IMAGEN)
 	PUSH	(r2)
 	bsr		Comp
 	addu	r30, r30, 8
@@ -308,30 +313,26 @@ NF_FIN:
 
 Comp:										; Comp (Img1, Img2)
 	PUSH	(r1)
-	or		r2, r0, r0 						; Dif = 0
-	or		r29, r0, r0						; r29 = 0
-	ld		r4, r30, 4						; dir Im1
-	ld		r6, r30, 8						; dir Im2
-	ld		r11, r4, 0						; r11 <- M1
-	ld		r8, r4, 4						; r8 <- N1
-	mulu	r8, r11, r8						; r8 <- elementos a comparar
-	ld		r12, r6, 0						; r12 <- M2
-	ld		r10, r6, 4						; r10 <- N2
-	addu	r4, r4, 8						; r4 <- dir primer elemento Im1
-	addu	r6, r6, 8						; r6 <- dir primer elemento Im2
-	addu	r16, r0, r0						; Contador con elementos comparados
+	or		r2, r0, r0						; Dif = 0
+	or		r29, r0, r0						; Res = 0
+	ld		r4, r30, 4						; dir Img1
+	ld		r6, r30, 8						; dir Img2
+	ld		r8, r4, 0						; M
+	ld		r10, r4, 4						; N (se suponen matrices iguales)
+	mulu	r8, r8, r10						; M*N
+	addu	r4, r4, 8						; Puntero a primer elemento Img1
+	addu	r6, r6, 8						; Puntero a primer elemento Img2
+	or		r10, r0, r0						; Contador de elementos
 
 COMPARA:
-	ld.b	r11, r4, r14					; r11 <- Dato1_Im1
-	ld.b	r12, r6, r14					; r12 <- Dato1_Im2
-	sub		r13, r12, r11
-	muls	r13, r13, r13
-	add		r2, r2, r13						; Dif = Dif + (Dato_Im1-Dato_Im2)^2
-	addu	r4, r4, 1						; r4 <- r4 + 1 (Actualiza puntero)
-	addu	r5, r5, 1						; r5 <- r5 + 1 (Actualiza puntero)
-	addu	r16, r16, 1						; Act. contador elementos comparados
-	cmp		r3, r16, r8
-	bb1		lt, r3, COMPARA					; Si quedan elementos por comparar, repite
+	ld.b	r11, r4, r10					; Valor elemento apuntado de Img1
+	ld.b	r12, r6, r10					; Valor elemento apuntado de Img2
+	sub		r13, r11, r12					; DatoImg1 - DatoImg2
+	muls	r13, r13, r13					; (DatoImg1 - DatoImg2)^2
+	add		r2, r2, r13						; Dif = Dif + (DatoImg1 - DatoImg2)^2
+	addu	r10, r10, 1						; Actualizo contador
+	cmp		r3, r10, r8
+	bb1		lt, r3, COMPARA
 
 CMP_FIN:
 	divu	r2, r2, r8						; Dif = Dif / M*N
